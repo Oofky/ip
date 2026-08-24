@@ -14,9 +14,7 @@ ____________________________________________________________
 Blessings! Bogos beckons. Bring Bogos business? :]""";
     private static final String BYE_STRING = "Bye bye! :]";
     private static final int MAX_TASKS = 100;
-    private static final String[] tasks = new String[MAX_TASKS];
-    // Records whether the task at the corresponding index in tasks is complete
-    private static final boolean[] isDone = new boolean[MAX_TASKS];
+    private static final Task[] tasks = new Task[MAX_TASKS];
 
     public static void main(String[] args) {
         System.out.println(BANNER_STRING);
@@ -36,7 +34,7 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
                 System.out.println(INDENT_STRING + "Behold bullets:");
                 for (int i = 0; i < numberOfTasks; i++) {
                     System.out.println(INDENT_STRING + (i + 1) + ".["
-                            + (isDone[i] ? "X" : " ") + "] " + tasks[i]);
+                            + tasks[i].getStatusIcon() + "] " + tasks[i].getDescription());
                 }
             } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
                 boolean mark = command.startsWith("mark");
@@ -47,23 +45,25 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
                         System.out.println(INDENT_STRING + "Bummer. Bullet beyond bounds. :[");
                     } else {
                         int taskIndex = taskNumber - 1;
-                        
-                        if (isDone[taskIndex] == mark) { // Redundant action
+                        Task task = tasks[taskIndex];
+
+                        if (task.isDone() == mark) { // Redundant action
                             System.out.println(INDENT_STRING + "Bro, box basically behaved beforehand.");
                         } else if (mark) {
+                            task.markAsDone();
                             System.out.println(INDENT_STRING + "Bravo! Bogos boxed bullet:");
-                            System.out.println(INDENT_STRING + "  [X] " + tasks[taskIndex]);
+                            System.out.println(INDENT_STRING + "  [" + task.getStatusIcon() + "] " + task.getDescription());
                         } else {
+                            task.markAsNotDone();
                             System.out.println(INDENT_STRING + "Bet! Bogos blanked box:");
-                            System.out.println(INDENT_STRING + "  [ ] " + tasks[taskIndex]);
+                            System.out.println(INDENT_STRING + "  [" + task.getStatusIcon() + "] " + task.getDescription());
                         }
-                        isDone[taskIndex] = mark;
                     }
                 } catch (NumberFormatException exception) {
                     System.out.println(INDENT_STRING + "Bogus. Bring Bogos base-ten. :[");
                 }
             } else if (numberOfTasks < MAX_TASKS) { // Defensive check
-                tasks[numberOfTasks] = command;
+                tasks[numberOfTasks] = new Task(command);
                 numberOfTasks++;
                 System.out.println(INDENT_STRING + "bullet born: " + command);
             }
