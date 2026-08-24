@@ -38,17 +38,26 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
                     System.out.println(INDENT_STRING + (i + 1) + ".["
                             + (isDone[i] ? "X" : " ") + "] " + tasks[i]);
                 }
-            } else if (command.startsWith("mark ")) {
-                String taskNumberText = command.substring("mark ".length()).trim();
+            } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
+                boolean mark = command.startsWith("mark");
+                String taskNumberText = command.substring(mark ? "mark ".length() : "unmark ".length()).trim();
                 try {
                     int taskNumber = Integer.parseInt(taskNumberText);
                     if (taskNumber < 1 || taskNumber > numberOfTasks) {
                         System.out.println(INDENT_STRING + "Bummer. Bullet beyond bounds. :[");
                     } else {
                         int taskIndex = taskNumber - 1;
-                        isDone[taskIndex] = true;
-                        System.out.println(INDENT_STRING + "Bravo! Bogos boxed bullet:");
-                        System.out.println(INDENT_STRING + "  [X] " + tasks[taskIndex]);
+                        
+                        if (isDone[taskIndex] == mark) { // Redundant action
+                            System.out.println(INDENT_STRING + "Bro, box basically behaved beforehand.");
+                        } else if (mark) {
+                            System.out.println(INDENT_STRING + "Bravo! Bogos boxed bullet:");
+                            System.out.println(INDENT_STRING + "  [X] " + tasks[taskIndex]);
+                        } else {
+                            System.out.println(INDENT_STRING + "Bet! Bogos blanked box:");
+                            System.out.println(INDENT_STRING + "  [ ] " + tasks[taskIndex]);
+                        }
+                        isDone[taskIndex] = mark;
                     }
                 } catch (NumberFormatException exception) {
                     System.out.println(INDENT_STRING + "Bogus. Bring Bogos base-ten. :[");
