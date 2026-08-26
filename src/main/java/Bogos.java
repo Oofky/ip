@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Bogos {
@@ -13,9 +14,7 @@ public class Bogos {
 ____________________________________________________________
 Blessings! Bogos beckons. Bring Bogos business? :]""";
     private static final String BYE_STRING = "Bye bye! :]";
-    private static final int MAX_TASKS = 100;
-    private static final Task[] tasks = new Task[MAX_TASKS];
-    private static int numberOfTasks = 0;
+    private static final ArrayList<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) {
         System.out.println(BANNER_STRING);
@@ -33,10 +32,10 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
             
             try {
                 if (command.equals("list")) {
-                    if (numberOfTasks > 0) {
+                    if (tasks.size() > 0) {
                         bogosSay("Behold bulleted board:");
-                        for (int i = 0; i < numberOfTasks; i++) {
-                            bogosSay((i + 1) + "." + tasks[i].toString());
+                        for (int i = 0; i < tasks.size(); i++) {
+                            bogosSay((i + 1) + "." + tasks.get(i).toString());
                         }
                     } else { throw new BogosException("But board be blank..."); }
                     
@@ -45,11 +44,11 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
                     String taskNumberText = command.substring(mark ? "mark ".length() : "unmark ".length()).trim();
                     try {
                         int taskNumber = Integer.parseInt(taskNumberText);
-                        if (taskNumber < 1 || taskNumber > numberOfTasks) {
+                        if (taskNumber < 1 || taskNumber > tasks.size()) {
                             throw new BogosException("Bummer. Bullet beyond bounds. :[");
                         } else {
                             int taskIndex = taskNumber - 1;
-                            Task task = tasks[taskIndex];
+                            Task task = tasks.get(taskIndex);
 
                             if (task.isDone() == mark) { // Redundant action
                                 throw new BogosException("Bro, box basically behaved beforehand.");
@@ -62,6 +61,24 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
                                 bogosSay("Bet! Bogos blanked box:");
                                 bogosSay("  " + task.toString());
                             }
+                        }
+                    } catch (NumberFormatException exception) {
+                        throw new BogosException("Bogus. Bring Bogos base-ten. :[");
+                    }
+
+                } else if (command.startsWith("delete ")) {
+                    String taskNumberText = command.substring("delete ".length()).trim();
+                    try {
+                        int taskNumber = Integer.parseInt(taskNumberText);
+                        if (taskNumber < 1 || taskNumber > tasks.size()) {
+                            throw new BogosException("Bummer. Bullet beyond bounds. :[");
+                        } else {
+                            int taskIndex = taskNumber - 1;
+                            Task task = tasks.get(taskIndex);
+                            tasks.remove(task);
+                            bogosSay("Brilliant! Bye bye bullet:");
+                            bogosSay("  " + task.toString());
+                            bogosSay(Integer.toString(tasks.size()) + " bullet(s) being.");
                         }
                     } catch (NumberFormatException exception) {
                         throw new BogosException("Bogus. Bring Bogos base-ten. :[");
@@ -109,11 +126,10 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
     }
 
     private static void addTask(Task newTask) {
-        tasks[numberOfTasks] = newTask;
-        numberOfTasks++;
+        tasks.add(newTask);
         bogosSay("Boom! Bullet born: ");
         bogosSay("  " + newTask.toString());
-        bogosSay(Integer.toString(numberOfTasks) + " bullet(s) being.");
+        bogosSay(Integer.toString(tasks.size()) + " bullet(s) being.");
     }
 
     private static void verifyInputBlank(String... inputs) throws BogosException {
