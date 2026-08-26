@@ -33,8 +33,7 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
             } else if (command.equals("list")) {
                 System.out.println(INDENT_STRING + "Behold bullets:");
                 for (int i = 0; i < numberOfTasks; i++) {
-                    System.out.println(INDENT_STRING + (i + 1) + ".["
-                            + tasks[i].getStatusIcon() + "] " + tasks[i].getDescription());
+                    System.out.println(INDENT_STRING + (i + 1) + "." + tasks[i].toString());
                 }
             } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
                 boolean mark = command.startsWith("mark");
@@ -52,20 +51,56 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
                         } else if (mark) {
                             task.markAsDone();
                             System.out.println(INDENT_STRING + "Bravo! Bogos boxed bullet:");
-                            System.out.println(INDENT_STRING + "  [" + task.getStatusIcon() + "] " + task.getDescription());
+                            System.out.println(INDENT_STRING + "  " + task.toString());
                         } else {
                             task.markAsNotDone();
                             System.out.println(INDENT_STRING + "Bet! Bogos blanked box:");
-                            System.out.println(INDENT_STRING + "  [" + task.getStatusIcon() + "] " + task.getDescription());
+                            System.out.println(INDENT_STRING + "  " + task.toString());
                         }
                     }
                 } catch (NumberFormatException exception) {
                     System.out.println(INDENT_STRING + "Bogus. Bring Bogos base-ten. :[");
                 }
-            } else if (numberOfTasks < MAX_TASKS) { // Defensive check
-                tasks[numberOfTasks] = new Task(command);
+            } else if (command.startsWith("todo ")) {
+                String todoText = command.substring("todo ".length()).trim();
+                Task newTask = new Todo(todoText);
+                tasks[numberOfTasks] = newTask;
                 numberOfTasks++;
-                System.out.println(INDENT_STRING + "bullet born: " + command);
+                System.out.println(INDENT_STRING + "Boom! Bullet born: ");
+                System.out.println(INDENT_STRING + "  " + newTask.toString());
+                System.out.println(INDENT_STRING + numberOfTasks + " bullet(s) being.");
+            } else if (command.startsWith("deadline ")) {
+                int byIndex = command.indexOf(" /by ");
+                if (byIndex > "deadline".length()) { // Check if /by exists AND if there's a task description
+                    String deadlineText = command.substring("deadline ".length(), byIndex).trim();
+                    String by = command.substring(byIndex + " /by ".length()).trim();
+                    Task newTask = new Deadline(deadlineText, by);
+                    tasks[numberOfTasks] = newTask;
+                    numberOfTasks++;
+                    System.out.println(INDENT_STRING + "Boom! Bullet born: ");
+                    System.out.println(INDENT_STRING + "  " + newTask.toString());
+                    System.out.println(INDENT_STRING + numberOfTasks + " bullet(s) being.");
+                } else {
+                    System.out.println(INDENT_STRING + "bwhat");
+                }
+            } else if (command.startsWith("event ")) {
+                int fromIndex = command.indexOf(" /from ");
+                int toIndex = command.indexOf(" /to ");
+                if (fromIndex > "event".length() && toIndex > fromIndex) {
+                    String eventText = command.substring("event ".length(), fromIndex).trim();
+                    String starting = command.substring(fromIndex + " /from ".length(), toIndex).trim();
+                    String ending = command.substring(toIndex + " /to ".length()).trim();
+                    Task newTask = new Event(eventText, starting, ending);
+                    tasks[numberOfTasks] = newTask;
+                    numberOfTasks++;
+                    System.out.println(INDENT_STRING + "Boom! Bullet born: ");
+                    System.out.println(INDENT_STRING + "  " + newTask.toString());
+                    System.out.println(INDENT_STRING + numberOfTasks + " bullet(s) being.");
+                } else {
+                    System.out.println(INDENT_STRING + "bwhat");
+                }
+            } else {
+                System.out.println(INDENT_STRING + "bwhat");
             }
 
             System.out.println(HORIZ_STRING);
