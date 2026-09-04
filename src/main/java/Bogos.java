@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
     private static final ArrayList<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) {
+        loadTasks();
+
         System.out.println(BANNER_STRING);
         Scanner scanner = new Scanner(System.in);
 
@@ -144,6 +147,50 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
         }
     }
 
+    private static void loadTasks() {
+        try {
+            File file = new File(DATA_FILE_PATH);
+            if (!file.exists()) {
+                return; // First time running, no file to load
+            }
+            
+            Scanner fileScanner = new Scanner(file);
+            while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine();
+                String[] parts = line.split(" \\| ");
+                
+                if (parts.length < 3) continue; // Skip invalid lines
+                
+                String type = parts[0];
+                boolean isDone = parts[1].equals("1");
+                String description = parts[2];
+                
+                Task task = null;
+                switch (type) {
+                    case "T":
+                        task = new Todo(description);
+                        break;
+                    case "D":
+                        task = new Deadline(description, parts[3]);
+                        break;
+                    case "E":
+                        task = new Event(description, parts[3], parts[4]);
+                        break;
+                }
+                
+                if (task != null) {
+                    if (isDone) {
+                        task.markAsDone();
+                    }
+                    tasks.add(task);
+                }
+            }
+            fileScanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Bad boot: " + e.getMessage());
+        }
+    }
+
     private static void saveTasks() {
         try {
             File file = new File(DATA_FILE_PATH);
@@ -154,11 +201,11 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
             
             FileWriter fw = new FileWriter(file);
             for (Task task : tasks) {
-                fw.write(task.toString() + System.lineSeparator());
+                fw.write(task.toFileFormat() + System.lineSeparator());
             }
             fw.close();
         } catch (IOException e) {
-            bogosSay("Bad browse: " + e.getMessage());
+            bogosSay("Bad boot: " + e.getMessage());
         }
     }
 }

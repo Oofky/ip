@@ -37,4 +37,8 @@ public class Task {
     public String toString() {
         return "[" + getTaskType() + "][" + getStatusIcon() + "] " + getDescription(); 
     }
+
+    public String toFileFormat() {
+        return getTaskType() + " | " + (isDone() ? "1" : "0") + " | " + getDescription();
+    }
 }

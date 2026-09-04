@@ -14,4 +14,8 @@ public class Deadline extends Task {
     public String toString() {
         return super.toString() + " (by: " + getBy() + ")"; 
     }
+
+    public String toFileFormat() {
+        return super.toFileFormat() + " | " + getBy();
+    }
 }

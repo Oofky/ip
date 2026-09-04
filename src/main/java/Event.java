@@ -20,4 +20,8 @@ public class Event extends Task {
     public String toString() {
         return super.toString() + " (from: " + getStarting() + " to: " + getEnding() + ")";
     }
+
+    public String toFileFormat() {
+        return super.toFileFormat() + " | " + getStarting() + " | " + getEnding();
+    }
 }
