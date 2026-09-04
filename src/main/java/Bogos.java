@@ -3,6 +3,8 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -105,7 +107,12 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
                         String deadlineText = command.substring("deadline ".length(), byIndex).trim();
                         String by = command.substring(byIndex + " /by ".length()).trim();
                         verifyInputBlank(deadlineText, by);
-                        addTask(new Deadline(deadlineText, by));
+                        try {
+                            addTask(new Deadline(deadlineText, LocalDate.parse(by)));
+                        } catch (DateTimeParseException exception) {
+                            throw new BogosException("Bogus date"); // TODO: change this message
+                        }
+                        
                     } else { throw new BogosException("bwhat [deadline ... /by ...]"); }
 
                 } else if (command.startsWith("event ")) {
@@ -116,7 +123,12 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
                         String starting = command.substring(fromIndex + " /from ".length(), toIndex).trim();
                         String ending = command.substring(toIndex + " /to ".length()).trim();
                         verifyInputBlank(eventText, starting, ending);
-                        addTask(new Event(eventText, starting, ending));
+                        try {
+                            addTask(new Event(eventText, LocalDate.parse(starting), LocalDate.parse(ending)));
+                        } catch (DateTimeParseException exception) {
+                            throw new BogosException("Bogus date"); // TODO: change this message
+                        }
+                        
                     } else { throw new BogosException("bwhat [event ... /from ... /to ...]"); }
 
                 } else {
@@ -174,10 +186,10 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
                         task = new Todo(description);
                         break;
                     case "D":
-                        task = new Deadline(description, parts[3]);
+                        task = new Deadline(description, LocalDate.parse(parts[3]));
                         break;
                     case "E":
-                        task = new Event(description, parts[3], parts[4]);
+                        task = new Event(description, LocalDate.parse(parts[3]), LocalDate.parse(parts[4]));
                         break;
                 }
                 
