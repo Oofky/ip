@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -18,7 +19,7 @@ public class Bogos {
 ____________________________________________________________
 Blessings! Bogos beckons. Bring Bogos business? :]""";
     private static final String BYE_STRING = "Bye bye! :]";
-    private static final String DATA_FILE_PATH = "./data/bogos.txt";
+    private static final String DATA_FILE_PATH = Paths.get(".", "data", "bogos.txt").toString();
     private static final ArrayList<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) {
