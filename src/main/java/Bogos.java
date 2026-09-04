@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -14,6 +17,7 @@ public class Bogos {
 ____________________________________________________________
 Blessings! Bogos beckons. Bring Bogos business? :]""";
     private static final String BYE_STRING = "Bye bye! :]";
+    private static final String DATA_FILE_PATH = "./data/bogos.txt";
     private static final ArrayList<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -113,6 +117,8 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
                     throw new BogosException("bwhat");
                 }
 
+                saveTasks();
+
             } catch (BogosException e) {
                 bogosSay(e.getMessage());
             } finally {
@@ -135,6 +141,24 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
     private static void verifyInputBlank(String... inputs) throws BogosException {
         for (String s : inputs) {
             if (s.isBlank()) { throw new BogosException("bwhat body"); }
+        }
+    }
+
+    private static void saveTasks() {
+        try {
+            File file = new File(DATA_FILE_PATH);
+            // Create the parent directories (e.g., ./data) if they don't exist
+            if (file.getParentFile() != null) {
+                file.getParentFile().mkdirs();
+            }
+            
+            FileWriter fw = new FileWriter(file);
+            for (Task task : tasks) {
+                fw.write(task.toString() + System.lineSeparator());
+            }
+            fw.close();
+        } catch (IOException e) {
+            bogosSay("Bad browse: " + e.getMessage());
         }
     }
 }
