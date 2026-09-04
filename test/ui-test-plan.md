@@ -22,8 +22,8 @@ Verify that to-dos, deadlines, and events are added with their type-specific det
 
 ```text
 todo borrow book
-deadline return book /by Sunday
-event project meeting /from Mon 2pm /to 4pm
+deadline return book /by 2026-09-05
+event project meeting /from 2026-09-05 /to 2026-09-06
 list
 bye
 ```
@@ -46,19 +46,19 @@ ____________________________________________________________
 ____________________________________________________________
 ____________________________________________________________
          Boom! Bullet born: 
-           [D][ ] return book (by: Sunday)
+           [D][ ] return book (by: Sep 05 2026)
          2 bullet(s) being.
 ____________________________________________________________
 ____________________________________________________________
          Boom! Bullet born: 
-           [E][ ] project meeting (from: Mon 2pm to: 4pm)
+           [E][ ] project meeting (from: Sep 05 2026 to: Sep 06 2026)
          3 bullet(s) being.
 ____________________________________________________________
 ____________________________________________________________
-         Behold bullets:
+         Behold bulleted board:
          1.[T][ ] borrow book
-         2.[D][ ] return book (by: Sunday)
-         3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+         2.[D][ ] return book (by: Sep 05 2026)
+         3.[E][ ] project meeting (from: Sep 05 2026 to: Sep 06 2026)
 ____________________________________________________________
 ____________________________________________________________
          Bye bye! :]

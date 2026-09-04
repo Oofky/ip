@@ -1,9 +1,9 @@
 public abstract class Task {
-    public final String taskType;
+    private final String taskType;
     private final String description;
     private boolean isDone;
 
-    public Task(String taskType, String description) {
+    protected Task(String taskType, String description) {
         this.taskType = taskType;
         this.description = description;
         this.isDone = false;
@@ -35,10 +35,13 @@ public abstract class Task {
 
     @Override
     public String toString() {
-        return "[" + getTaskType() + "][" + getStatusIcon() + "] " + getDescription(); 
+        return "[" + getTaskType() + "][" + getStatusIcon() + "] " 
+            + getDescription(); 
     }
 
     public String toFileFormat() {
-        return getTaskType() + " | " + (isDone() ? "1" : "0") + " | " + getDescription();
+        return getTaskType() 
+            + " | " + (isDone() ? "1" : "0") 
+            + " | " + getDescription();
     }
 }
