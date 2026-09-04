@@ -38,7 +38,9 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
             } 
             
             try {
-                if (command.equals("list")) {
+                if (command.contains("|")) {
+                    throw new BogosException("Bah! Bpipes ('|') banned!");
+                } else if (command.equals("list")) {
                     if (tasks.size() > 0) {
                         bogosSay("Behold bulleted board:");
                         for (int i = 0; i < tasks.size(); i++) {
