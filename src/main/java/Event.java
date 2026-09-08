@@ -8,9 +8,7 @@ public class Event extends Task {
     private final LocalDate starting;
     private final LocalDate ending;
 
-    public Event(String description, 
-                LocalDate starting, 
-                LocalDate ending) throws IllegalArgumentException {
+    public Event(String description, LocalDate starting, LocalDate ending) {
         super("E", description);
         if (ending.isBefore(starting)) {
             throw new IllegalArgumentException("Event end date cannot be before its start date.");

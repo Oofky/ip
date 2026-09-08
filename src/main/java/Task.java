@@ -4,6 +4,9 @@ public abstract class Task {
     private boolean isDone;
 
     protected Task(String taskType, String description) {
+        if (description.isBlank()) {
+            throw new IllegalArgumentException("Task description cannot be empty.");
+        }
         this.taskType = taskType;
         this.description = description;
         this.isDone = false;
@@ -41,7 +44,7 @@ public abstract class Task {
 
     public String toFileFormat() {
         return getTaskType() 
-            + " | " + (isDone() ? "1" : "0") 
+            + " | " + (isDone() ? "true" : "false")
             + " | " + getDescription();
     }
 }
