@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Bogos {
@@ -22,7 +23,7 @@ ____________________________________________________________
 Blessings! Bogos beckons. Bring Bogos business? :]""";
     private static final String BYE_STRING = "Bye bye! :]";
     private static final String DATA_FILE_PATH = Paths.get(".", "data", "bogos.txt").toString();
-    private static final ArrayList<Task> tasks = new ArrayList<>();
+    private static final List<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) {
         loadTasks();
@@ -44,6 +45,7 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
             try {
                 if (command.contains("|")) {
                     throw new BogosException("Bah! Bpipes ('|') banned!");
+
                 } else if (command.equals("list")) {
                     if (!tasks.isEmpty()) {
                         bogosSay("Behold bulleted board:");
@@ -55,92 +57,26 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
                     }
                     
                 } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
-                    boolean mark = command.startsWith("mark");
-                    String taskNumberText = command.substring(mark ? "mark ".length() : "unmark ".length()).trim();
-                    try {
-                        int taskNumber = Integer.parseInt(taskNumberText);
-                        if (taskNumber < 1 || taskNumber > tasks.size()) {
-                            throw new BogosException("Bummer. Bullet beyond bounds. :[");
-                        } else {
-                            int taskIndex = taskNumber - 1;
-                            Task task = tasks.get(taskIndex);
-
-                            if (task.isDone() == mark) { // Redundant action
-                                throw new BogosException("Bro, box basically behaved beforehand.");
-                            } else {
-                                if (mark) {
-                                    task.markAsDone();
-                                    bogosSay("Bravo! Bogos boxed bullet:");
-                                } else {
-                                    task.markAsNotDone();
-                                    bogosSay("Bet! Bogos blanked box:");
-                                }
-                                tasksHaveChanged = true;
-                                bogosSay("  " + task);
-                            }
-                        }
-                    } catch (NumberFormatException exception) {
-                        throw new BogosException("Bogus. Bring Bogos base-ten. :[");
-                    }
+                    handleMarkCommand(command);
+                    tasksHaveChanged = true;
 
                 } else if (command.startsWith("delete ")) {
-                    String taskNumberText = command.substring("delete ".length()).trim();
-                    try {
-                        int taskNumber = Integer.parseInt(taskNumberText);
-                        if (taskNumber < 1 || taskNumber > tasks.size()) {
-                            throw new BogosException("Bummer. Bullet beyond bounds. :[");
-                        } else {
-                            int taskIndex = taskNumber - 1;
-                            Task task = tasks.get(taskIndex);
-                            tasks.remove(task);
-                            tasksHaveChanged = true;
-                            bogosSay("Brilliant! Bye bye bullet:");
-                            bogosSay("  " + task);
-                            bogosSay(Integer.toString(tasks.size()) + " bullet(s) being.");
-                        }
-                    } catch (NumberFormatException exception) {
-                        throw new BogosException("Bogus. Bring Bogos base-ten. :[");
-                    }
+                    handleDeleteCommand(command);
+                    tasksHaveChanged = true;
 
                 } else if (command.startsWith("todo ")) {
-                    String todoText = command.substring("todo ".length()).trim();
-                    verifyNoInputIsBlank(todoText);
-                    addTask(new Todo(todoText));
+                    String description = command.substring("todo ".length()).trim();
+                    verifyNoInputIsBlank(description);
+                    addTask(new Todo(description));
                     tasksHaveChanged = true;
                     
                 } else if (command.startsWith("deadline ")) {
-                    int byIndex = command.indexOf(" /by ");
-                    if (byIndex >= "deadline ".length()) { // Check if /by exists and is not empty string
-                        String deadlineText = command.substring("deadline ".length(), byIndex).trim();
-                        String by = command.substring(byIndex + " /by ".length()).trim();
-                        verifyNoInputIsBlank(deadlineText, by);
-                        try {
-                            addTask(new Deadline(deadlineText, LocalDate.parse(by)));
-                            tasksHaveChanged = true;
-                        } catch (DateTimeParseException exception) {
-                            throw new BogosException("Bogus date"); // TODO: change this message
-                        }
-                        
-                    } else { throw new BogosException("bwhat [deadline ... /by ...]"); }
+                    handleDeadlineCommand(command);
+                    tasksHaveChanged = true;
 
                 } else if (command.startsWith("event ")) {
-                    int fromIndex = command.indexOf(" /from ");
-                    int toIndex = command.indexOf(" /to ");
-                    if (fromIndex >= "event ".length() && toIndex >= fromIndex) { // Check if /from and /to exists and are not empty strings
-                        String eventText = command.substring("event ".length(), fromIndex).trim();
-                        String starting = command.substring(fromIndex + " /from ".length(), toIndex).trim();
-                        String ending = command.substring(toIndex + " /to ".length()).trim();
-                        verifyNoInputIsBlank(eventText, starting, ending);
-                        try {
-                            addTask(new Event(eventText, LocalDate.parse(starting), LocalDate.parse(ending)));
-                            tasksHaveChanged = true;
-                        } catch (DateTimeParseException exception) {
-                            throw new BogosException("Bogus date"); // TODO: change this message
-                        } catch (IllegalArgumentException exception) {
-                            throw new BogosException("Bogus, are you going back in time??"); // TODO: change this message
-                        }
-                        
-                    } else { throw new BogosException("bwhat [event ... /from ... /to ...]"); }
+                    handleEventCommand(command);
+                    tasksHaveChanged = true;
 
                 } else {
                     throw new BogosException("bwhat");
@@ -162,11 +98,89 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
         System.out.println(INDENT_STRING + message);
     }
 
+    private static void handleMarkCommand(String command) throws BogosException {
+        boolean mark = command.startsWith("mark");
+        Task task = getTaskByNumberText(command.substring(mark ? "mark ".length() : "unmark ".length()).trim());
+
+        if (task.isDone() == mark) {
+            throw new BogosException("Bro, box basically behaved beforehand.");
+        }
+
+        if (mark) {
+            task.markAsDone();
+            bogosSay("Bravo! Bogos boxed bullet:");
+        } else {
+            task.markAsNotDone();
+            bogosSay("Bet! Bogos blanked box:");
+        }
+        bogosSay("  " + task);
+    }
+
+    private static void handleDeleteCommand(String command) throws BogosException {
+        Task task = getTaskByNumberText(command.substring("delete ".length()).trim());
+        tasks.remove(task);
+        bogosSay("Brilliant! Bye bye bullet:");
+        bogosSay("  " + task);
+        bogosSay(Integer.toString(tasks.size()) + " bullet(s) being.");
+    }
+
+    private static void handleDeadlineCommand(String command) throws BogosException {
+        int byIndex = command.indexOf(" /by ");
+        if (byIndex < "deadline ".length()) { // Check if /by exists and is not empty string
+            throw new BogosException("bwhat [deadline ... /by ...]");
+        }
+
+        String description = command.substring("deadline ".length(), byIndex).trim();
+        String by = command.substring(byIndex + " /by ".length()).trim();
+        verifyNoInputIsBlank(description, by);
+        addTask(new Deadline(description, parseDate(by)));
+    }
+
+    private static void handleEventCommand(String command) throws BogosException {
+        int fromIndex = command.indexOf(" /from ");
+        int toIndex = command.indexOf(" /to ");
+        if (fromIndex < "event ".length() || toIndex < fromIndex) { // Check if /from and /to exists and are not empty strings
+            throw new BogosException("bwhat [event ... /from ... /to ...]");
+        }
+
+        String description = command.substring("event ".length(), fromIndex).trim();
+        String starting = command.substring(fromIndex + " /from ".length(), toIndex).trim();
+        String ending = command.substring(toIndex + " /to ".length()).trim();
+        verifyNoInputIsBlank(description, starting, ending);
+        try {
+            addTask(new Event(description, parseDate(starting), parseDate(ending)));
+        } catch (IllegalArgumentException e) {
+            throw new BogosException("Bro be breathing backwards??");
+        }
+    }
+
     private static void addTask(Task newTask) {
         tasks.add(newTask);
         bogosSay("Boom! Bullet born: ");
         bogosSay("  " + newTask);
         bogosSay(Integer.toString(tasks.size()) + " bullet(s) being.");
+    }
+
+    /** Finds the task identified by user input after validating its one-based number. */
+    private static Task getTaskByNumberText(String taskNumberText) throws BogosException {
+        try {
+            int taskNumber = Integer.parseInt(taskNumberText);
+            if (taskNumber < 1 || taskNumber > tasks.size()) {
+                throw new BogosException("Bummer. Bullet beyond bounds. :[");
+            }
+            return tasks.get(taskNumber - 1);
+        } catch (NumberFormatException e) {
+            throw new BogosException("Bogus. Bring Bogos base-ten. :[");
+        }
+    }
+
+    /** Parses an ISO-8601 date and converts parsing failures to a user-facing error. */
+    private static LocalDate parseDate(String dateText) throws BogosException {
+        try {
+            return LocalDate.parse(dateText);
+        } catch (DateTimeParseException e) {
+            throw new BogosException("bwhat [yyyy-mm-dd]");
+        }
     }
 
     private static void verifyNoInputIsBlank(String... inputs) throws BogosException {
