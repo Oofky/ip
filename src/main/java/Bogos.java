@@ -10,18 +10,6 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Bogos {
-    private static final String HORIZ_STRING = "____________________________________________________________";
-    private static final String INDENT_STRING = "         ";
-    private static final String BANNER_STRING = """
-      ___             __ _                  
-     | _ )    ___    / _` |   ___     ___   
-     | _ \\   / _ \\   \\__, |  / _ \\   (_-<   
-     |___/   \\___/   |___/   \\___/   /__/_  
-   _|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| 
-   "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'
-____________________________________________________________
-Blessings! Bogos beckons. Bring Bogos business? :]""";
-    private static final String BYE_STRING = "Bye bye! :]";
     private static final String DATA_FILE_PATH = Paths.get(".", "data", "bogos.txt").toString();
     private static final List<Task> tasks = new ArrayList<>();
     private static final Ui ui = new Ui();
@@ -29,16 +17,16 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
     public static void main(String[] args) {
         loadTasks();
 
-        ui.show(BANNER_STRING);
+        ui.showWelcome();
 
         while (ui.hasNextCommand()) {
             String command = ui.readCommand();
             boolean tasksHaveChanged = false;
-            ui.show(HORIZ_STRING);
+            ui.showDivider();
 
             if (command.equals("bye")) {
-                bogosSay(BYE_STRING);
-                ui.show(HORIZ_STRING);
+                ui.showGoodbye();
+                ui.showDivider();
                 break;
             } 
             
@@ -48,9 +36,9 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
 
                 } else if (command.equals("list")) {
                     if (!tasks.isEmpty()) {
-                        bogosSay("Behold bulleted board:");
+                        ui.showMessage("Behold bulleted board:");
                         for (int i = 0; i < tasks.size(); i++) {
-                            bogosSay((i + 1) + "." + tasks.get(i));
+                            ui.showMessage((i + 1) + "." + tasks.get(i));
                         }
                     } else {
                         throw new BogosException("But board be blank...");
@@ -87,15 +75,11 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
                 }
 
             } catch (BogosException e) {
-                bogosSay(e.getMessage());
+                ui.showMessage(e.getMessage());
             } finally {
-                ui.show(HORIZ_STRING);
+                ui.showDivider();
             }
         }
-    }
-
-    private static void bogosSay(String message) {
-        ui.show(INDENT_STRING + message);
     }
 
     private static void handleMarkCommand(String command) throws BogosException {
@@ -108,20 +92,20 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
 
         if (mark) {
             task.markAsDone();
-            bogosSay("Bravo! Bogos boxed bullet:");
+            ui.showMessage("Bravo! Bogos boxed bullet:");
         } else {
             task.markAsNotDone();
-            bogosSay("Bet! Bogos blanked box:");
+            ui.showMessage("Bet! Bogos blanked box:");
         }
-        bogosSay("  " + task);
+        ui.showMessage("  " + task);
     }
 
     private static void handleDeleteCommand(String command) throws BogosException {
         Task task = getTaskByNumberText(command.substring("delete ".length()).trim());
         tasks.remove(task);
-        bogosSay("Brilliant! Bye bye bullet:");
-        bogosSay("  " + task);
-        bogosSay(Integer.toString(tasks.size()) + " bullet(s) being.");
+        ui.showMessage("Brilliant! Bye bye bullet:");
+        ui.showMessage("  " + task);
+        ui.showMessage(Integer.toString(tasks.size()) + " bullet(s) being.");
     }
 
     private static void handleDeadlineCommand(String command) throws BogosException {
@@ -156,9 +140,9 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
 
     private static void addTask(Task newTask) {
         tasks.add(newTask);
-        bogosSay("Boom! Bullet born: ");
-        bogosSay("  " + newTask);
-        bogosSay(Integer.toString(tasks.size()) + " bullet(s) being.");
+        ui.showMessage("Boom! Bullet born: ");
+        ui.showMessage("  " + newTask);
+        ui.showMessage(Integer.toString(tasks.size()) + " bullet(s) being.");
     }
 
     /** Finds the task identified by user input after validating its one-based number. */
@@ -245,13 +229,13 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
                         tasks.add(task);
 
                     } catch (DateTimeParseException | IllegalArgumentException e) {
-                        bogosSay("Bad backup: " + line + ", bypassed");
+                        ui.showMessage("Bad backup: " + line + ", bypassed");
                         continue; // Skip
                     }
                 }
             }
         } catch (FileNotFoundException e) {
-            bogosSay("Bad boot: " + e.getMessage() + ", backup bypassed"); // Skip
+            ui.showMessage("Bad boot: " + e.getMessage() + ", backup bypassed"); // Skip
         }
     }
 
@@ -270,7 +254,7 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
             }
 
         } catch (IOException e) {
-            bogosSay("Bad boot: " + e.getMessage() + ", backup bypassed"); // Skip
+            ui.showMessage("Bad boot: " + e.getMessage() + ", backup bypassed"); // Skip
         }
     }
 }
