@@ -1,22 +1,14 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class Bogos {
-    private static final String DATA_FILE_PATH = Paths.get(".", "data", "bogos.txt").toString();
-    private static final List<Task> tasks = new ArrayList<>();
     private static final Ui ui = new Ui();
+    private static final Storage storage = new Storage("data/bogos.txt");
+    private static final List<Task> tasks = new ArrayList<>(storage.loadTasks(ui));
 
     public static void main(String[] args) {
-        loadTasks();
-
         ui.showWelcome();
 
         while (ui.hasNextCommand()) {
@@ -71,7 +63,7 @@ public class Bogos {
                 }
 
                 if (tasksHaveChanged) {
-                    saveTasks();
+                    storage.saveTasks(tasks, ui);
                 }
 
             } catch (BogosException e) {
@@ -175,86 +167,4 @@ public class Bogos {
         }
     }
 
-    private static void loadTasks() {
-        try {
-            File file = new File(DATA_FILE_PATH);
-            if (!file.exists()) {
-                return; // First time running, no file to load
-            }
-            
-            try (Scanner fileScanner = new Scanner(file)) {
-                while (fileScanner.hasNextLine()) {
-                    String line = fileScanner.nextLine();
-                    String[] parts = line.split(" \\| ", -1);
-                    Task task;
-
-                    try {
-                        if (parts.length < 3) {
-                            throw new IllegalArgumentException("Too few fields for task.");
-                        }
-                        if (!parts[1].equals("true") && !parts[1].equals("false")) {
-                            throw new IllegalArgumentException("Invalid isDone status.");
-                        }
-
-                        String type = parts[0];
-                        boolean isDone = Boolean.parseBoolean(parts[1]);
-                        String description = parts[2];
-
-                        switch (type) {
-                            case "T":
-                                if (parts.length != 3) {
-                                    throw new IllegalArgumentException("Wrong number of fields for task type.");
-                                }
-                                task = new Todo(description);
-                                break;
-                            case "D":
-                                if (parts.length != 4) {
-                                    throw new IllegalArgumentException("Wrong number of fields for task type.");
-                                }
-                                task = new Deadline(description, LocalDate.parse(parts[3]));
-                                break;
-                            case "E":
-                                if (parts.length != 5) {
-                                    throw new IllegalArgumentException("Wrong number of fields for task type.");
-                                }
-                                task = new Event(description, LocalDate.parse(parts[3]), LocalDate.parse(parts[4]));
-                                break;
-                            default:
-                                throw new IllegalArgumentException("Unknown task type.");
-                        }
-
-                        if (isDone) {
-                            task.markAsDone();
-                        }
-                        tasks.add(task);
-
-                    } catch (DateTimeParseException | IllegalArgumentException e) {
-                        ui.showMessage("Bad backup: " + line + ", bypassed");
-                        continue; // Skip
-                    }
-                }
-            }
-        } catch (FileNotFoundException e) {
-            ui.showMessage("Bad boot: " + e.getMessage() + ", backup bypassed"); // Skip
-        }
-    }
-
-    private static void saveTasks() {
-        try {
-            File file = new File(DATA_FILE_PATH);
-            // Create the parent directories (e.g., ./data) if they don't exist
-            if (file.getParentFile() != null) {
-                file.getParentFile().mkdirs();
-            }
-
-            try (FileWriter fileWriter = new FileWriter(file)) {
-                for (Task task : tasks) {
-                    fileWriter.write(task.toFileFormat() + System.lineSeparator());
-                }
-            }
-
-        } catch (IOException e) {
-            ui.showMessage("Bad boot: " + e.getMessage() + ", backup bypassed"); // Skip
-        }
-    }
 }
