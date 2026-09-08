@@ -1,12 +1,11 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Paths;
 
 public class Bogos {
     private static final Ui ui = new Ui();
-    private static final Storage storage = new Storage("data/bogos.txt");
-    private static final List<Task> tasks = new ArrayList<>(storage.loadTasks(ui));
+    private static final Storage storage = new Storage(Paths.get("data", "bogos.txt"));
+    private static final TaskList tasks = new TaskList(storage.loadTasks(ui));
 
     public static void main(String[] args) {
         ui.showWelcome();
@@ -29,8 +28,8 @@ public class Bogos {
                 } else if (command.equals("list")) {
                     if (!tasks.isEmpty()) {
                         ui.showMessage("Behold bulleted board:");
-                        for (int i = 0; i < tasks.size(); i++) {
-                            ui.showMessage((i + 1) + "." + tasks.get(i));
+                        for (int i = 1; i <= tasks.size(); i++) {
+                            ui.showMessage(i + "." + tasks.getTask(i));
                         }
                     } else {
                         throw new BogosException("But board be blank...");
@@ -63,7 +62,7 @@ public class Bogos {
                 }
 
                 if (tasksHaveChanged) {
-                    storage.saveTasks(tasks, ui);
+                    storage.saveTasks(tasks.asList(), ui);
                 }
 
             } catch (BogosException e) {
@@ -76,7 +75,7 @@ public class Bogos {
 
     private static void handleMarkCommand(String command) throws BogosException {
         boolean mark = command.startsWith("mark");
-        Task task = getTaskByNumberText(command.substring(mark ? "mark ".length() : "unmark ".length()).trim());
+        Task task = tasks.getTask(parseTaskNumber(command.substring(mark ? "mark ".length() : "unmark ".length()).trim()));
 
         if (task.isDone() == mark) {
             throw new BogosException("Bro, box basically behaved beforehand.");
@@ -93,8 +92,7 @@ public class Bogos {
     }
 
     private static void handleDeleteCommand(String command) throws BogosException {
-        Task task = getTaskByNumberText(command.substring("delete ".length()).trim());
-        tasks.remove(task);
+        Task task = tasks.removeTask(parseTaskNumber(command.substring("delete ".length()).trim()));
         ui.showMessage("Brilliant! Bye bye bullet:");
         ui.showMessage("  " + task);
         ui.showMessage(Integer.toString(tasks.size()) + " bullet(s) being.");
@@ -131,20 +129,16 @@ public class Bogos {
     }
 
     private static void addTask(Task newTask) {
-        tasks.add(newTask);
+        tasks.addTask(newTask);
         ui.showMessage("Boom! Bullet born: ");
         ui.showMessage("  " + newTask);
         ui.showMessage(Integer.toString(tasks.size()) + " bullet(s) being.");
     }
 
-    /** Finds the task identified by user input after validating its one-based number. */
-    private static Task getTaskByNumberText(String taskNumberText) throws BogosException {
+    /** Parses the task's one-based number from user input. */
+    private static int parseTaskNumber(String taskNumberText) throws BogosException {
         try {
-            int taskNumber = Integer.parseInt(taskNumberText);
-            if (taskNumber < 1 || taskNumber > tasks.size()) {
-                throw new BogosException("Bummer. Bullet beyond bounds. :[");
-            }
-            return tasks.get(taskNumber - 1);
+            return Integer.parseInt(taskNumberText);
         } catch (NumberFormatException e) {
             throw new BogosException("Bogus. Bring Bogos base-ten. :[");
         }

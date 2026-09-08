@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -12,9 +13,9 @@ import java.util.Scanner;
 public class Storage {
     private final File file;
 
-    /** Creates storage backed by the file at the given path. */
-    public Storage(String filePath) {
-        file = new File(filePath);
+    /** Creates storage backed by the given path. */
+    public Storage(Path filePath) {
+        file = filePath.toFile();
     }
 
     /**
