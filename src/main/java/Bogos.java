@@ -24,21 +24,21 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
     private static final String BYE_STRING = "Bye bye! :]";
     private static final String DATA_FILE_PATH = Paths.get(".", "data", "bogos.txt").toString();
     private static final List<Task> tasks = new ArrayList<>();
+    private static final Ui ui = new Ui();
 
     public static void main(String[] args) {
         loadTasks();
 
-        System.out.println(BANNER_STRING);
-        Scanner scanner = new Scanner(System.in);
+        ui.show(BANNER_STRING);
 
-        while (scanner.hasNextLine()) {
-            String command = scanner.nextLine();
+        while (ui.hasNextCommand()) {
+            String command = ui.readCommand();
             boolean tasksHaveChanged = false;
-            System.out.println(HORIZ_STRING);
+            ui.show(HORIZ_STRING);
 
             if (command.equals("bye")) {
                 bogosSay(BYE_STRING);
-                System.out.println(HORIZ_STRING);
+                ui.show(HORIZ_STRING);
                 break;
             } 
             
@@ -89,13 +89,13 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
             } catch (BogosException e) {
                 bogosSay(e.getMessage());
             } finally {
-                System.out.println(HORIZ_STRING);
+                ui.show(HORIZ_STRING);
             }
         }
     }
 
     private static void bogosSay(String message) {
-        System.out.println(INDENT_STRING + message);
+        ui.show(INDENT_STRING + message);
     }
 
     private static void handleMarkCommand(String command) throws BogosException {
