@@ -1,3 +1,5 @@
+package bogos;
+
 public abstract class Task {
     private final String taskType;
     private final String description;

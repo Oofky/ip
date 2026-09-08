@@ -1,3 +1,5 @@
+package bogos;
+
 import java.util.Scanner;
 
 /** Handles all console input and output for the Bogos application. */

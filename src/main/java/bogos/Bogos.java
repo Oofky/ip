@@ -1,3 +1,5 @@
+package bogos;
+
 import java.nio.file.Paths;
 
 public class Bogos {

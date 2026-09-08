@@ -3,8 +3,8 @@
 ## Test environment
 
 - Java version: 25
-- Compile command: `javac -d _temp/ui-test-classes src/main/java/*.java`
-- Run command: `java -cp _temp/ui-test-classes Bogos`
+- Compile command: `javac -d _temp/ui-test-classes src/main/java/bogos/*.java`
+- Run command: `java -cp _temp/ui-test-classes bogos.Bogos`
 
 Run the planned sessions from the repository root with:
 
