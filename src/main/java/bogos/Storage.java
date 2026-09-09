@@ -15,7 +15,7 @@ import java.util.Scanner;
  * Loads tasks from and saves tasks to the application's data file.
  */
 public class Storage {
-    private final File file;
+    private final File dataFile;
 
     /**
      * Creates storage backed by the given path.
@@ -23,7 +23,7 @@ public class Storage {
      * @param filePath Path of the data file.
      */
     public Storage(Path filePath) {
-        file = filePath.toFile();
+        dataFile = filePath.toFile();
     }
 
     /**
@@ -32,13 +32,13 @@ public class Storage {
      * @param ui UI used to report skipped or unreadable task data.
      * @return Valid tasks found in the data file.
      */
-    public List<Task> loadTasks(Ui ui) {
+    public List<Task> loadTasks(Ui userInterface) {
         List<Task> tasks = new ArrayList<>();
-        if (!file.exists()) {
+        if (!dataFile.exists()) {
             return tasks;
         }
 
-        try (Scanner fileScanner = new Scanner(file)) {
+        try (Scanner fileScanner = new Scanner(dataFile)) {
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
                 String[] parts = line.split(" \\| ", -1);
@@ -50,11 +50,11 @@ public class Storage {
                     }
                     tasks.add(task);
                 } catch (DateTimeParseException | IllegalArgumentException e) {
-                    ui.showMessage("Bad backup: " + line + ", bypassed");
+                    userInterface.showMessage("Bad backup: " + line + ", bypassed");
                 }
             }
         } catch (FileNotFoundException e) {
-            ui.showMessage("Bad boot: " + e.getMessage() + ", backup bypassed");
+            userInterface.showMessage("Bad boot: " + e.getMessage() + ", backup bypassed");
         }
         return tasks;
     }
@@ -65,17 +65,17 @@ public class Storage {
      * @param tasks Tasks to save.
      * @param ui UI used to report an I/O failure.
      */
-    public void saveTasks(List<Task> tasks, Ui ui) {
-        if (file.getParentFile() != null) {
-            file.getParentFile().mkdirs();
+    public void saveTasks(List<Task> tasks, Ui userInterface) {
+        if (dataFile.getParentFile() != null) {
+            dataFile.getParentFile().mkdirs();
         }
 
-        try (FileWriter fileWriter = new FileWriter(file)) {
+        try (FileWriter fileWriter = new FileWriter(dataFile)) {
             for (Task task : tasks) {
                 fileWriter.write(task.toFileFormat() + System.lineSeparator());
             }
         } catch (IOException e) {
-            ui.showMessage("Bad boot: " + e.getMessage() + ", backup bypassed");
+            userInterface.showMessage("Bad boot: " + e.getMessage() + ", backup bypassed");
         }
     }
 

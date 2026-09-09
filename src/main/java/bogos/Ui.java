@@ -46,14 +46,23 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
         return scanner.nextLine();
     }
 
+    /**
+     * Displays the application banner and greeting.
+     */
     public void showWelcome() {
         System.out.println(BANNER);
     }
 
+    /**
+     * Displays the application farewell.
+     */
     public void showGoodbye() {
         showMessage(GOODBYE);
     }
 
+    /**
+     * Displays a horizontal divider.
+     */
     public void showDivider() {
         System.out.println(HORIZONTAL_LINE);
     }

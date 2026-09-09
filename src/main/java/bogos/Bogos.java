@@ -6,10 +6,10 @@ import java.nio.file.Paths;
  * Starts the Bogos task-list application and processes user commands.
  */
 public class Bogos {
-    private static final Ui ui = new Ui();
+    private static final Ui userInterface = new Ui();
     private static final Parser parser = new Parser();
     private static final Storage storage = new Storage(Paths.get("data", "bogos.txt"));
-    private static final TaskList tasks = new TaskList(storage.loadTasks(ui));
+    private static final TaskList tasks = new TaskList(storage.loadTasks(userInterface));
 
     /**
      * Runs the application command loop.
@@ -17,65 +17,65 @@ public class Bogos {
      * @param args Command-line arguments, which are not used.
      */
     public static void main(String[] args) {
-        ui.showWelcome();
+        userInterface.showWelcome();
 
-        while (ui.hasNextCommand()) {
-            String command = ui.readCommand();
-            boolean tasksHaveChanged = false;
-            ui.showDivider();
+        while (userInterface.hasNextCommand()) {
+            String command = userInterface.readCommand();
+            boolean hasTasksChanged = false;
+            userInterface.showDivider();
 
             if (command.equals("bye")) {
-                ui.showGoodbye();
-                ui.showDivider();
+                userInterface.showGoodbye();
+                userInterface.showDivider();
                 break;
-            } 
-            
+            }
+
             try {
                 if (command.contains("|")) {
                     throw new BogosException("Bah! Bpipes ('|') banned!");
 
                 } else if (command.equals("list")) {
                     if (!tasks.isEmpty()) {
-                        ui.showMessage("Behold bulleted board:");
+                        userInterface.showMessage("Behold bulleted board:");
                         for (int i = 1; i <= tasks.size(); i++) {
-                            ui.showMessage(i + "." + tasks.getTask(i));
+                            userInterface.showMessage(i + "." + tasks.getTask(i));
                         }
                     } else {
                         throw new BogosException("But board be blank...");
                     }
-                    
+
                 } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
                     handleMarkCommand(command);
-                    tasksHaveChanged = true;
+                    hasTasksChanged = true;
 
                 } else if (command.startsWith("delete ")) {
                     handleDeleteCommand(command);
-                    tasksHaveChanged = true;
+                    hasTasksChanged = true;
 
                 } else if (command.startsWith("todo ")) {
                     addTask(parser.parseTask(command));
-                    tasksHaveChanged = true;
-                    
+                    hasTasksChanged = true;
+
                 } else if (command.startsWith("deadline ")) {
                     addTask(parser.parseTask(command));
-                    tasksHaveChanged = true;
+                    hasTasksChanged = true;
 
                 } else if (command.startsWith("event ")) {
                     addTask(parser.parseTask(command));
-                    tasksHaveChanged = true;
+                    hasTasksChanged = true;
 
                 } else {
                     throw new BogosException("bwhat");
                 }
 
-                if (tasksHaveChanged) {
-                    storage.saveTasks(tasks.asList(), ui);
+                if (hasTasksChanged) {
+                    storage.saveTasks(tasks.asList(), userInterface);
                 }
 
             } catch (BogosException e) {
-                ui.showMessage(e.getMessage());
+                userInterface.showMessage(e.getMessage());
             } finally {
-                ui.showDivider();
+                userInterface.showDivider();
             }
         }
     }
@@ -87,21 +87,22 @@ public class Bogos {
      * @throws BogosException If the task number is invalid or its status is unchanged.
      */
     private static void handleMarkCommand(String command) throws BogosException {
-        boolean mark = command.startsWith("mark");
-        Task task = tasks.getTask(parser.parseTaskNumber(command.substring(mark ? "mark ".length() : "unmark ".length()).trim()));
+        boolean isMarkCommand = command.startsWith("mark");
+        String taskNumberText = command.substring(isMarkCommand ? "mark ".length() : "unmark ".length()).trim();
+        Task task = tasks.getTask(parser.parseTaskNumber(taskNumberText));
 
-        if (task.isDone() == mark) {
+        if (task.isDone() == isMarkCommand) {
             throw new BogosException("Bro, box basically behaved beforehand.");
         }
 
-        if (mark) {
+        if (isMarkCommand) {
             task.markAsDone();
-            ui.showMessage("Bravo! Bogos boxed bullet:");
+            userInterface.showMessage("Bravo! Bogos boxed bullet:");
         } else {
             task.markAsNotDone();
-            ui.showMessage("Bet! Bogos blanked box:");
+            userInterface.showMessage("Bet! Bogos blanked box:");
         }
-        ui.showMessage("  " + task);
+        userInterface.showMessage("  " + task);
     }
 
     /**
@@ -111,10 +112,11 @@ public class Bogos {
      * @throws BogosException If the task number is invalid.
      */
     private static void handleDeleteCommand(String command) throws BogosException {
-        Task task = tasks.removeTask(parser.parseTaskNumber(command.substring("delete ".length()).trim()));
-        ui.showMessage("Brilliant! Bye bye bullet:");
-        ui.showMessage("  " + task);
-        ui.showMessage(Integer.toString(tasks.size()) + " bullet(s) being.");
+        String taskNumberText = command.substring("delete ".length()).trim();
+        Task task = tasks.removeTask(parser.parseTaskNumber(taskNumberText));
+        userInterface.showMessage("Brilliant! Bye bye bullet:");
+        userInterface.showMessage("  " + task);
+        userInterface.showMessage(Integer.toString(tasks.size()) + " bullet(s) being.");
     }
 
     /**
@@ -124,9 +126,9 @@ public class Bogos {
      */
     private static void addTask(Task newTask) {
         tasks.addTask(newTask);
-        ui.showMessage("Boom! Bullet born: ");
-        ui.showMessage("  " + newTask);
-        ui.showMessage(Integer.toString(tasks.size()) + " bullet(s) being.");
+        userInterface.showMessage("Boom! Bullet born: ");
+        userInterface.showMessage("  " + newTask);
+        userInterface.showMessage(Integer.toString(tasks.size()) + " bullet(s) being.");
     }
 
 }

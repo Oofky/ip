@@ -8,24 +8,24 @@ import java.util.Locale;
  * Represents a deadline task.
  */
 public class Deadline extends Task {
-    private static final DateTimeFormatter DISPLAY_DATE_FORMATTER = 
-        DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
-    private final LocalDate by;
+    private static final DateTimeFormatter DISPLAY_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
+    private final LocalDate dueDate;
 
     /**
      * Creates an incomplete deadline with the given description and due date.
      *
      * @param description Description of the deadline.
-     * @param by Due date of the deadline.
+     * @param dueDate Due date of the deadline.
      * @throws IllegalArgumentException If the description is blank.
      */
-    public Deadline(String description, LocalDate by) {
+    public Deadline(String description, LocalDate dueDate) {
         super("D", description);
-        this.by = by;
+        this.dueDate = dueDate;
     }
 
-    public LocalDate getBy() {
-        return by;
+    public LocalDate getDueDate() {
+        return dueDate;
     }
 
     /**
@@ -33,8 +33,8 @@ public class Deadline extends Task {
      *
      * @return Formatted due date.
      */
-    public String getFormattedBy() {
-        return by.format(DISPLAY_DATE_FORMATTER);
+    public String getFormattedDueDate() {
+        return dueDate.format(DISPLAY_DATE_FORMATTER);
     }
 
     /**
@@ -44,8 +44,8 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        return super.toString() 
-            + " (by: " + getFormattedBy() + ")"; 
+        return super.toString()
+                + " (by: " + getFormattedDueDate() + ")";
     }
 
     /**
@@ -55,7 +55,7 @@ public class Deadline extends Task {
      */
     @Override
     public String toFileFormat() {
-        return super.toFileFormat() 
-            + " | " + getBy().toString();
+        return super.toFileFormat()
+                + " | " + getDueDate();
     }
 }

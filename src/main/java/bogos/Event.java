@@ -8,34 +8,34 @@ import java.util.Locale;
  * Represents an event task.
  */
 public class Event extends Task {
-    private static final DateTimeFormatter DISPLAY_DATE_FORMATTER = 
-        DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
-    private final LocalDate starting;
-    private final LocalDate ending;
+    private static final DateTimeFormatter DISPLAY_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
+    private final LocalDate startDate;
+    private final LocalDate endDate;
 
     /**
      * Creates an incomplete event with the given description and date range.
      *
      * @param description Description of the event.
-     * @param starting Date on which the event starts.
-     * @param ending Date on which the event ends.
+     * @param startDate Date on which the event starts.
+     * @param endDate Date on which the event ends.
      * @throws IllegalArgumentException If the description is blank or the end precedes the start.
      */
-    public Event(String description, LocalDate starting, LocalDate ending) {
+    public Event(String description, LocalDate startDate, LocalDate endDate) {
         super("E", description);
-        if (ending.isBefore(starting)) {
+        if (endDate.isBefore(startDate)) {
             throw new IllegalArgumentException("Event end date cannot be before its start date.");
         }
-        this.starting = starting;
-        this.ending = ending;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
-    public LocalDate getStarting() {
-        return starting;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public LocalDate getEnding() {
-        return ending;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
     /**
@@ -43,17 +43,17 @@ public class Event extends Task {
      *
      * @return Formatted start date.
      */
-    public String getFormattedStarting() {
-        return starting.format(DISPLAY_DATE_FORMATTER);
-    } 
+    public String getFormattedStartDate() {
+        return startDate.format(DISPLAY_DATE_FORMATTER);
+    }
 
     /**
      * Returns the end date in the format used by the console UI.
      *
      * @return Formatted end date.
      */
-    public String getFormattedEnding() {
-        return ending.format(DISPLAY_DATE_FORMATTER);
+    public String getFormattedEndDate() {
+        return endDate.format(DISPLAY_DATE_FORMATTER);
     }
 
     /**
@@ -63,9 +63,9 @@ public class Event extends Task {
      */
     @Override
     public String toString() {
-        return super.toString() 
-            + " (from: " + getFormattedStarting() 
-            + " to: " + getFormattedEnding() + ")";
+        return super.toString()
+                + " (from: " + getFormattedStartDate()
+                + " to: " + getFormattedEndDate() + ")";
     }
 
     /**
@@ -75,8 +75,8 @@ public class Event extends Task {
      */
     @Override
     public String toFileFormat() {
-        return super.toFileFormat() 
-            + " | " + getStarting().toString() 
-            + " | " + getEnding().toString();
+        return super.toFileFormat()
+                + " | " + getStartDate()
+                + " | " + getEndDate();
     }
 }

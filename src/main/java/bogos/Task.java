@@ -36,10 +36,16 @@ public abstract class Task {
         return (isDone() ? "X" : " ");
     }
 
+    /**
+     * Marks this task as complete.
+     */
     public void markAsDone() {
         isDone = true;
     }
 
+    /**
+     * Marks this task as incomplete.
+     */
     public void markAsNotDone() {
         isDone = false;
     }
@@ -55,8 +61,8 @@ public abstract class Task {
      */
     @Override
     public String toString() {
-        return "[" + getTaskType() + "][" + getStatusIcon() + "] " 
-            + getDescription(); 
+        return "[" + getTaskType() + "][" + getStatusIcon() + "] "
+                + getDescription();
     }
 
     /**
@@ -65,8 +71,8 @@ public abstract class Task {
      * @return Data-file representation of this task.
      */
     public String toFileFormat() {
-        return getTaskType() 
-            + " | " + (isDone() ? "true" : "false")
-            + " | " + getDescription();
+        return getTaskType()
+                + " | " + (isDone() ? "true" : "false")
+                + " | " + getDescription();
     }
 }

@@ -29,10 +29,20 @@ public class TaskList {
         return tasks.isEmpty();
     }
 
+    /**
+     * Returns the number of tasks in this list.
+     *
+     * @return Number of tasks.
+     */
     public int size() {
         return tasks.size();
     }
 
+    /**
+     * Adds a task to this list.
+     *
+     * @param task Task to add.
+     */
     public void addTask(Task task) {
         tasks.add(task);
     }
