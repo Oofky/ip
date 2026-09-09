@@ -2,12 +2,14 @@ package bogos;
 
 import java.nio.file.Paths;
 
+/** Starts the Bogos task-list application and processes user commands. */
 public class Bogos {
     private static final Ui ui = new Ui();
     private static final Parser parser = new Parser();
     private static final Storage storage = new Storage(Paths.get("data", "bogos.txt"));
     private static final TaskList tasks = new TaskList(storage.loadTasks(ui));
 
+    /** Runs the application command loop. */
     public static void main(String[] args) {
         ui.showWelcome();
 
@@ -72,6 +74,7 @@ public class Bogos {
         }
     }
 
+    /** Marks or unmarks the task specified by a mark-related command and displays the result. */
     private static void handleMarkCommand(String command) throws BogosException {
         boolean mark = command.startsWith("mark");
         Task task = tasks.getTask(parser.parseTaskNumber(command.substring(mark ? "mark ".length() : "unmark ".length()).trim()));
@@ -90,6 +93,7 @@ public class Bogos {
         ui.showMessage("  " + task);
     }
 
+    /** Deletes the task specified by a delete command and displays the result. */
     private static void handleDeleteCommand(String command) throws BogosException {
         Task task = tasks.removeTask(parser.parseTaskNumber(command.substring("delete ".length()).trim()));
         ui.showMessage("Brilliant! Bye bye bullet:");
@@ -97,6 +101,7 @@ public class Bogos {
         ui.showMessage(Integer.toString(tasks.size()) + " bullet(s) being.");
     }
 
+    /** Adds a task to the list and displays the newly added task. */
     private static void addTask(Task newTask) {
         tasks.addTask(newTask);
         ui.showMessage("Boom! Bullet born: ");

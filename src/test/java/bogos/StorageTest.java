@@ -21,6 +21,7 @@ public class StorageTest {
     Path temporaryDirectory;
 
     @Test
+    /** Verifies that all supported task types are written in storage format. */
     public void saveTasks_withMultipleTaskTypes_writesExpectedFileContents() throws IOException {
         Path file = temporaryDirectory.resolve("bogos.txt");
         Storage storage = new Storage(file);
@@ -40,6 +41,7 @@ public class StorageTest {
     }
 
     @Test
+    /** Verifies that valid stored task records are reconstructed correctly. */
     public void loadTasks_withValidTaskRecords_returnsMatchingTasks() throws IOException {
         Path file = temporaryDirectory.resolve("bogos.txt");
         Files.write(file, List.of(
@@ -64,6 +66,7 @@ public class StorageTest {
     }
 
     @Test
+    /** Verifies that a stored completed task remains complete after loading. */
     public void loadTasks_withCompletedTask_marksTaskAsDone() throws IOException {
         Path file = temporaryDirectory.resolve("bogos.txt");
         Files.write(file, List.of("T | true | borrow book"));
@@ -76,6 +79,7 @@ public class StorageTest {
     }
 
     @Test
+    /** Verifies that loading from a missing data file returns no tasks. */
     public void loadTasks_whenFileDoesNotExist_returnsEmptyList() {
         Storage storage = new Storage(temporaryDirectory.resolve("missing.txt"));
 
@@ -85,6 +89,7 @@ public class StorageTest {
     }
 
     @Test
+    /** Verifies that invalid stored records are skipped while valid ones are loaded. */
     public void loadTasks_withInvalidRecord_skipsInvalidRecord() throws IOException {
         Path file = temporaryDirectory.resolve("bogos.txt");
         Files.write(file, List.of(
