@@ -11,11 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/** Loads tasks from and saves tasks to the application's data file. */
+/**
+ * Loads tasks from and saves tasks to the application's data file.
+ */
 public class Storage {
     private final File file;
 
-    /** Creates storage backed by the given path. */
+    /**
+     * Creates storage backed by the given path.
+     *
+     * @param filePath Path of the data file.
+     */
     public Storage(Path filePath) {
         file = filePath.toFile();
     }
@@ -23,8 +29,8 @@ public class Storage {
     /**
      * Loads valid tasks from the data file and reports recoverable file errors through the UI.
      *
-     * @param ui the UI used to report skipped or unreadable task data
-     * @return the valid tasks found in the data file
+     * @param ui UI used to report skipped or unreadable task data.
+     * @return Valid tasks found in the data file.
      */
     public List<Task> loadTasks(Ui ui) {
         List<Task> tasks = new ArrayList<>();
@@ -53,7 +59,12 @@ public class Storage {
         return tasks;
     }
 
-    /** Saves every task to the data file, reporting an I/O failure through the UI. */
+    /**
+     * Saves every task to the data file, reporting an I/O failure through the UI.
+     *
+     * @param tasks Tasks to save.
+     * @param ui UI used to report an I/O failure.
+     */
     public void saveTasks(List<Task> tasks, Ui ui) {
         if (file.getParentFile() != null) {
             file.getParentFile().mkdirs();
@@ -68,7 +79,13 @@ public class Storage {
         }
     }
 
-    /** Converts one stored task record into a task after validating its fields. */
+    /**
+     * Converts one stored task record into a task after validating its fields.
+     *
+     * @param parts Fields from a stored task record.
+     * @return Task represented by the record.
+     * @throws IllegalArgumentException If the record is malformed or has an unknown type.
+     */
     private Task createTask(String[] parts) {
         if (parts.length < 3) {
             throw new IllegalArgumentException("Too few fields for task.");
@@ -94,7 +111,13 @@ public class Storage {
         };
     }
 
-    /** Verifies that a stored task record has the expected number of fields. */
+    /**
+     * Verifies that a stored task record has the expected number of fields.
+     *
+     * @param parts Fields from a stored task record.
+     * @param expectedCount Required number of fields.
+     * @throws IllegalArgumentException If the record has the wrong number of fields.
+     */
     private void verifyFieldCount(String[] parts, int expectedCount) {
         if (parts.length != expectedCount) {
             throw new IllegalArgumentException("Wrong number of fields for task type.");

@@ -14,14 +14,22 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-/** Tests for saving tasks to and loading tasks from a data file. */
+/**
+ * Tests for saving tasks to and loading tasks from a data file.
+ */
 public class StorageTest {
-    /** A JUnit-managed directory that is unique to each test. */
+    /**
+     * A JUnit-managed directory that is unique to each test.
+     */
     @TempDir
     Path temporaryDirectory;
 
+    /**
+     * Verifies that all supported task types are written in storage format.
+     *
+     * @throws IOException If the test cannot read the temporary data file.
+     */
     @Test
-    /** Verifies that all supported task types are written in storage format. */
     public void saveTasks_withMultipleTaskTypes_writesExpectedFileContents() throws IOException {
         Path file = temporaryDirectory.resolve("bogos.txt");
         Storage storage = new Storage(file);
@@ -40,8 +48,12 @@ public class StorageTest {
                 "E | false | project meeting | 2026-09-15 | 2026-09-16"), Files.readAllLines(file));
     }
 
+    /**
+     * Verifies that valid stored task records are reconstructed correctly.
+     *
+     * @throws IOException If the test cannot write the temporary data file.
+     */
     @Test
-    /** Verifies that valid stored task records are reconstructed correctly. */
     public void loadTasks_withValidTaskRecords_returnsMatchingTasks() throws IOException {
         Path file = temporaryDirectory.resolve("bogos.txt");
         Files.write(file, List.of(
@@ -65,8 +77,12 @@ public class StorageTest {
         assertEquals(LocalDate.of(2026, 9, 16), event.getEnding());
     }
 
+    /**
+     * Verifies that a stored completed task remains complete after loading.
+     *
+     * @throws IOException If the test cannot write the temporary data file.
+     */
     @Test
-    /** Verifies that a stored completed task remains complete after loading. */
     public void loadTasks_withCompletedTask_marksTaskAsDone() throws IOException {
         Path file = temporaryDirectory.resolve("bogos.txt");
         Files.write(file, List.of("T | true | borrow book"));
@@ -78,8 +94,10 @@ public class StorageTest {
         assertTrue(tasks.get(0).isDone());
     }
 
+    /**
+     * Verifies that loading from a missing data file returns no tasks.
+     */
     @Test
-    /** Verifies that loading from a missing data file returns no tasks. */
     public void loadTasks_whenFileDoesNotExist_returnsEmptyList() {
         Storage storage = new Storage(temporaryDirectory.resolve("missing.txt"));
 
@@ -88,8 +106,12 @@ public class StorageTest {
         assertTrue(tasks.isEmpty());
     }
 
+    /**
+     * Verifies that invalid stored records are skipped while valid ones are loaded.
+     *
+     * @throws IOException If the test cannot write the temporary data file.
+     */
     @Test
-    /** Verifies that invalid stored records are skipped while valid ones are loaded. */
     public void loadTasks_withInvalidRecord_skipsInvalidRecord() throws IOException {
         Path file = temporaryDirectory.resolve("bogos.txt");
         Files.write(file, List.of(

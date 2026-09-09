@@ -9,10 +9,16 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 
-/** Tests for converting user commands into tasks and task numbers. */
+/**
+ * Tests for converting user commands into tasks and task numbers.
+ */
 public class ParserTest {
+    /**
+     * Verifies that a valid to-do command creates an incomplete to-do.
+     *
+     * @throws BogosException If the valid command cannot be parsed.
+     */
     @Test
-    /** Verifies that a valid to-do command creates an incomplete to-do. */
     public void parseTask_todo_success() throws BogosException {
         Parser parser = new Parser();
 
@@ -23,8 +29,12 @@ public class ParserTest {
         assertFalse(todo.isDone());
     }
 
+    /**
+     * Verifies that a valid deadline command creates an incomplete deadline.
+     *
+     * @throws BogosException If the valid command cannot be parsed.
+     */
     @Test
-    /** Verifies that a valid deadline command creates an incomplete deadline. */
     public void parseTask_deadline_success() throws BogosException {
         Parser parser = new Parser();
 
@@ -36,8 +46,12 @@ public class ParserTest {
         assertFalse(deadline.isDone());
     }
 
+    /**
+     * Verifies that a valid event command creates an incomplete event.
+     *
+     * @throws BogosException If the valid command cannot be parsed.
+     */
     @Test
-    /** Verifies that a valid event command creates an incomplete event. */
     public void parseTask_event_success() throws BogosException {
         Parser parser = new Parser();
 
@@ -50,8 +64,10 @@ public class ParserTest {
         assertFalse(event.isDone());
     }
 
+    /**
+     * Verifies that an unrecognised command produces a parser error.
+     */
     @Test
-    /** Verifies that an unrecognised command produces a parser error. */
     public void parseTask_nonsense_exceptionThrown() {
         Parser parser = new Parser();
 
@@ -61,8 +77,10 @@ public class ParserTest {
         assertEquals("bwhat", exception.getMessage());
     }
 
+    /**
+     * Verifies that a to-do command requires a description.
+     */
     @Test
-    /** Verifies that a to-do command requires a description. */
     public void parseTask_todoWithEmptyDesc_exceptionThrown() {
         Parser parser = new Parser();
 
@@ -72,8 +90,12 @@ public class ParserTest {
         assertEquals("bwhat body", exception.getMessage());
     }
 
+    /**
+     * Verifies that surrounding whitespace is removed from a to-do description.
+     *
+     * @throws BogosException If the valid command cannot be parsed.
+     */
     @Test
-    /** Verifies that surrounding whitespace is removed from a to-do description. */
     public void parseTask_todoWithLeadingTrailingWhitespace_trimmedDescription() throws BogosException {
         Parser parser = new Parser();
 
@@ -82,8 +104,10 @@ public class ParserTest {
         assertEquals("revise  notes", todo.getDescription());
     }
 
+    /**
+     * Verifies that a deadline command requires its due-date marker.
+     */
     @Test
-    /** Verifies that a deadline command requires its due-date marker. */
     public void parseTask_deadlineWithNoBy_exceptionThrown() {
         Parser parser = new Parser();
 
@@ -93,8 +117,10 @@ public class ParserTest {
         assertEquals("bwhat [deadline ... /by ...]", exception.getMessage());
     }
 
+    /**
+     * Verifies that a deadline command requires a due date.
+     */
     @Test
-    /** Verifies that a deadline command requires a due date. */
     public void parseTask_deadlineWithEmptyBy_exceptionThrown() {
         Parser parser = new Parser();
 
@@ -104,8 +130,10 @@ public class ParserTest {
         assertEquals("bwhat body", exception.getMessage());
     }
 
+    /**
+     * Verifies that a deadline command requires a description.
+     */
     @Test
-    /** Verifies that a deadline command requires a description. */
     public void parseTask_deadlineWithEmptyDesc_exceptionThrown() {
         Parser parser = new Parser();
 
@@ -115,8 +143,10 @@ public class ParserTest {
         assertEquals("bwhat body", exception.getMessage());
     }
 
+    /**
+     * Verifies that a deadline date must use the ISO-8601 format.
+     */
     @Test
-    /** Verifies that a deadline date must use the ISO-8601 format. */
     public void parseTask_deadlineWithInvalidByDate_exceptionThrown() {
         Parser parser = new Parser();
 
@@ -126,8 +156,10 @@ public class ParserTest {
         assertEquals("bwhat [yyyy-mm-dd]", exception.getMessage());
     }
 
+    /**
+     * Verifies that an event command requires its start-date marker.
+     */
     @Test
-    /** Verifies that an event command requires its start-date marker. */
     public void parseTask_eventWithNoFrom_exceptionThrown() {
         Parser parser = new Parser();
 
@@ -137,8 +169,10 @@ public class ParserTest {
         assertEquals("bwhat [event ... /from ... /to ...]", exception.getMessage());
     }
 
+    /**
+     * Verifies that an event command requires a start date.
+     */
     @Test
-    /** Verifies that an event command requires a start date. */
     public void parseTask_eventWithEmptyFrom_exceptionThrown() {
         Parser parser = new Parser();
 
@@ -148,8 +182,10 @@ public class ParserTest {
         assertEquals("bwhat body", exception.getMessage());
     }
 
+    /**
+     * Verifies that an event command requires its end-date marker.
+     */
     @Test
-    /** Verifies that an event command requires its end-date marker. */
     public void parseTask_eventWithNoTo_exceptionThrown() {
         Parser parser = new Parser();
 
@@ -159,8 +195,10 @@ public class ParserTest {
         assertEquals("bwhat [event ... /from ... /to ...]", exception.getMessage());
     }
 
+    /**
+     * Verifies that an event command requires an end date.
+     */
     @Test
-    /** Verifies that an event command requires an end date. */
     public void parseTask_eventWithEmptyTo_exceptionThrown() {
         Parser parser = new Parser();
 
@@ -170,8 +208,10 @@ public class ParserTest {
         assertEquals("bwhat body", exception.getMessage());
     }
 
+    /**
+     * Verifies that an event cannot end before it starts.
+     */
     @Test
-    /** Verifies that an event cannot end before it starts. */
     public void parseTask_eventWithReverseDates_exceptionThrown() {
         Parser parser = new Parser();
 
@@ -181,8 +221,10 @@ public class ParserTest {
         assertEquals("Bro be breathing backwards??", exception.getMessage());
     }
 
+    /**
+     * Verifies that an event start date must use the ISO-8601 format.
+     */
     @Test
-    /** Verifies that an event start date must use the ISO-8601 format. */
     public void parseTask_eventWithInvalidFromDate_exceptionThrown() {
         Parser parser = new Parser();
 
@@ -192,8 +234,12 @@ public class ParserTest {
         assertEquals("bwhat [yyyy-mm-dd]", exception.getMessage());
     }
 
+    /**
+     * Verifies that a whole-number task position is parsed successfully.
+     *
+     * @throws BogosException If the valid task number cannot be parsed.
+     */
     @Test
-    /** Verifies that a whole-number task position is parsed successfully. */
     public void parseTaskNumber_integer_success() throws BogosException {
         Parser parser = new Parser();
 
@@ -202,8 +248,10 @@ public class ParserTest {
         assertEquals(42, taskNumber);
     }
 
+    /**
+     * Verifies that a decimal task position produces a parser error.
+     */
     @Test
-    /** Verifies that a decimal task position produces a parser error. */
     public void parseTaskNumber_double_exceptionThrown() {
         Parser parser = new Parser();
 
@@ -213,8 +261,10 @@ public class ParserTest {
         assertEquals("Bogus. Bring Bogos base-ten. :[", exception.getMessage());
     }
 
+    /**
+     * Verifies that a non-numeric task position produces a parser error.
+     */
     @Test
-    /** Verifies that a non-numeric task position produces a parser error. */
     public void parseTaskNumber_alphabet_exceptionThrown() {
         Parser parser = new Parser();
 

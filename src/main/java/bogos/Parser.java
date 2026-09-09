@@ -3,9 +3,17 @@ package bogos;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-/** Interprets user command text and converts it into application data. */
+/**
+ * Interprets user command text and converts it into application data.
+ */
 public class Parser {
-    /** Creates the task described by a todo, deadline, or event command. */
+    /**
+     * Creates the task described by a to-do, deadline, or event command.
+     *
+     * @param command Command describing the task.
+     * @return Task described by the command.
+     * @throws BogosException If the command is not a valid task command.
+     */
     public Task parseTask(String command) throws BogosException {
         if (command.startsWith("todo ")) {
             return new Todo(getRequiredText(command.substring("todo ".length())));
@@ -19,7 +27,13 @@ public class Parser {
         throw new BogosException("bwhat");
     }
 
-    /** Parses a one-based task number from user input. */
+    /**
+     * Parses a one-based task number from user input.
+     *
+     * @param taskNumberText Text containing the task number.
+     * @return Parsed task number.
+     * @throws BogosException If the text is not a whole number.
+     */
     public int parseTaskNumber(String taskNumberText) throws BogosException {
         try {
             return Integer.parseInt(taskNumberText);
@@ -28,7 +42,13 @@ public class Parser {
         }
     }
 
-    /** Parses a deadline command into a deadline task. */
+    /**
+     * Parses a deadline command into a deadline task.
+     *
+     * @param command Deadline command to parse.
+     * @return Deadline task described by the command.
+     * @throws BogosException If the command is invalid.
+     */
     private Task parseDeadline(String command) throws BogosException {
         int byIndex = command.indexOf(" /by ");
         if (byIndex < "deadline ".length()) {
@@ -40,7 +60,13 @@ public class Parser {
         return new Deadline(description, parseDate(by));
     }
 
-    /** Parses an event command into an event task. */
+    /**
+     * Parses an event command into an event task.
+     *
+     * @param command Event command to parse.
+     * @return Event task described by the command.
+     * @throws BogosException If the command is invalid or its dates are reversed.
+     */
     private Task parseEvent(String command) throws BogosException {
         int fromIndex = command.indexOf(" /from ");
         int toIndex = command.indexOf(" /to ");
@@ -58,7 +84,13 @@ public class Parser {
         }
     }
 
-    /** Returns non-blank command text after removing surrounding whitespace. */
+    /**
+     * Returns non-blank command text after removing surrounding whitespace.
+     *
+     * @param text Text to validate and trim.
+     * @return Trimmed non-blank text.
+     * @throws BogosException If the text is blank.
+     */
     private String getRequiredText(String text) throws BogosException {
         String trimmedText = text.trim();
         if (trimmedText.isBlank()) {
@@ -67,7 +99,13 @@ public class Parser {
         return trimmedText;
     }
 
-    /** Parses an ISO-8601 date and converts failures to a user-facing error. */
+    /**
+     * Parses an ISO-8601 date and converts failures to a user-facing error.
+     *
+     * @param dateText Date text to parse.
+     * @return Parsed date.
+     * @throws BogosException If the date text is invalid.
+     */
     private LocalDate parseDate(String dateText) throws BogosException {
         try {
             return LocalDate.parse(dateText);
