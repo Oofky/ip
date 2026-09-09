@@ -2,6 +2,7 @@ package bogos;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Stores and manages the tasks currently known to the application.
@@ -72,6 +73,24 @@ public class TaskList {
         Task task = getTask(taskNumber);
         tasks.remove(task);
         return task;
+    }
+
+    /**
+     * Returns tasks whose descriptions contain the given keyword, ignoring case.
+     *
+     * @param keyword Keyword to search for.
+     * @return Matching tasks in their original order.
+     */
+    public List<Task> findTasks(String keyword) {
+        String lowerCaseKeyword = keyword.toLowerCase(Locale.ROOT);
+        List<Task> matchingTasks = new ArrayList<>();
+
+        for (Task task : tasks) {
+            if (task.getDescription().toLowerCase(Locale.ROOT).contains(lowerCaseKeyword)) {
+                matchingTasks.add(task);
+            }
+        }
+        return matchingTasks;
     }
 
     /**

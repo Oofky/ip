@@ -1,6 +1,7 @@
 package bogos;
 
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Starts the Bogos task-list application and processes user commands.
@@ -43,6 +44,9 @@ public class Bogos {
                     } else {
                         throw new BogosException("But board be blank...");
                     }
+
+                } else if (command.startsWith("find ")) {
+                    handleFindCommand(command);
 
                 } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
                     handleMarkCommand(command);
@@ -117,6 +121,25 @@ public class Bogos {
         userInterface.showMessage("Brilliant! Bye bye bullet:");
         userInterface.showMessage("  " + task);
         userInterface.showMessage(Integer.toString(tasks.size()) + " bullet(s) being.");
+    }
+
+    /**
+     * Finds tasks with descriptions containing the keyword in a find command.
+     *
+     * @param command Find command to process.
+     * @throws BogosException If the keyword is empty.
+     */
+    private static void handleFindCommand(String command) throws BogosException {
+        String keyword = command.substring("find ".length()).trim();
+        if (keyword.isEmpty()) {
+            throw new BogosException("bwhat keyword");
+        }
+
+        List<Task> matchingTasks = tasks.findTasks(keyword);
+        userInterface.showMessage("Bogos brings befitting bullets:");
+        for (int i = 0; i < matchingTasks.size(); i++) {
+            userInterface.showMessage((i + 1) + "." + matchingTasks.get(i));
+        }
     }
 
     /**
