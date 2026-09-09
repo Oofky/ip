@@ -45,6 +45,10 @@ the actual and expected output before making further code changes.
 
 ## Git
 
+All future branches and commits in this repository must follow the
+project-specific `seedu-git-standard` skill. Load and apply that skill before
+creating a branch, proposing a commit message, or committing changes.
+
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
