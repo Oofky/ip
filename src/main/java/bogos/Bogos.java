@@ -1,16 +1,38 @@
 package bogos;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Starts the Bogos task-list application and processes user commands.
  */
 public class Bogos {
-    private static final Ui userInterface = new Ui();
-    private static final Parser parser = new Parser();
-    private static final Storage storage = new Storage(Paths.get("data", "bogos.txt"));
-    private static final TaskList tasks = new TaskList(storage.loadTasks(userInterface));
+    private static final String WELCOME_MESSAGE = "Blessings! Bogos beckons. Bring Bogos business? :]";
+
+    private final Ui userInterface;
+    private final Parser parser;
+    private final Storage storage;
+    private final TaskList tasks;
+
+    /**
+     * Creates a Bogos application backed by the default data file.
+     */
+    public Bogos() {
+        this(new Ui());
+    }
+
+    /**
+     * Creates a Bogos application that reports storage problems through the given UI.
+     *
+     * @param userInterface UI used for storage messages.
+     */
+    public Bogos(Ui userInterface) {
+        this.userInterface = userInterface;
+        parser = new Parser();
+        storage = new Storage(Paths.get("data", "bogos.txt"));
+        tasks = new TaskList(storage.loadTasks(userInterface));
+    }
 
     /**
      * Runs the application command loop.
@@ -18,70 +40,120 @@ public class Bogos {
      * @param args Command-line arguments, which are not used.
      */
     public static void main(String[] args) {
-        userInterface.showWelcome();
+        Ui consoleUi = new Ui();
+        Bogos bogos = new Bogos(consoleUi);
+        consoleUi.showWelcome();
 
-        while (userInterface.hasNextCommand()) {
-            String command = userInterface.readCommand();
-            boolean hasTasksChanged = false;
-            userInterface.showDivider();
+        while (consoleUi.hasNextCommand()) {
+            String command = consoleUi.readCommand();
+            consoleUi.showDivider();
 
             if (command.equals("bye")) {
-                userInterface.showGoodbye();
-                userInterface.showDivider();
+                consoleUi.showGoodbye();
+                consoleUi.showDivider();
                 break;
             }
 
-            try {
-                if (command.contains("|")) {
-                    throw new BogosException("Bah! Bpipes ('|') banned!");
+            for (String responseLine : bogos.processCommand(command)) {
+                consoleUi.showMessage(responseLine);
+            }
+            consoleUi.showDivider();
+        }
+    }
 
-                } else if (command.equals("list")) {
-                    if (!tasks.isEmpty()) {
-                        userInterface.showMessage("Behold bulleted board:");
-                        for (int i = 1; i <= tasks.size(); i++) {
-                            userInterface.showMessage(i + "." + tasks.getTask(i));
-                        }
-                    } else {
-                        throw new BogosException("But board be blank...");
-                    }
+    /**
+     * Returns Bogos's greeting for the graphical user interface.
+     *
+     * @return Bogos's greeting.
+     */
+    public String getWelcomeMessage() {
+        return WELCOME_MESSAGE;
+    }
 
-                } else if (command.startsWith("find ")) {
-                    handleFindCommand(command);
+    /**
+     * Prints the standard Bogos banner and greeting to the console.
+     */
+    public void showConsoleWelcome() {
+        userInterface.showWelcome();
+    }
 
-                } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
-                    handleMarkCommand(command);
-                    hasTasksChanged = true;
+    /**
+     * Returns whether the command ends the application.
+     *
+     * @param command Command entered by the user.
+     * @return True if the command is {@code bye}.
+     */
+    public boolean isExitCommand(String command) {
+        return command.equals("bye");
+    }
 
-                } else if (command.startsWith("delete ")) {
-                    handleDeleteCommand(command);
-                    hasTasksChanged = true;
+    /**
+     * Processes a GUI command and returns Bogos's reply for display in a dialog box.
+     *
+     * @param command Command entered by the user.
+     * @return Response text, possibly spanning multiple lines.
+     */
+    public String getResponse(String command) {
+        List<String> responseLines;
+        userInterface.showDivider();
 
-                } else if (command.startsWith("todo ")) {
-                    addTask(parser.parseTask(command));
-                    hasTasksChanged = true;
-
-                } else if (command.startsWith("deadline ")) {
-                    addTask(parser.parseTask(command));
-                    hasTasksChanged = true;
-
-                } else if (command.startsWith("event ")) {
-                    addTask(parser.parseTask(command));
-                    hasTasksChanged = true;
-
-                } else {
-                    throw new BogosException("bwhat");
-                }
-
-                if (hasTasksChanged) {
-                    storage.saveTasks(tasks.asList(), userInterface);
-                }
-
-            } catch (BogosException e) {
-                userInterface.showMessage(e.getMessage());
-            } finally {
-                userInterface.showDivider();
+        if (isExitCommand(command)) {
+            responseLines = List.of("Bye bye! :]");
+            userInterface.showGoodbye();
+        } else {
+            responseLines = processCommand(command);
+            for (String responseLine : responseLines) {
+                userInterface.showMessage(responseLine);
             }
         }
+        userInterface.showDivider();
+        return String.join(System.lineSeparator(), responseLines);
+    }
+
+    /**
+     * Processes one non-exit command and returns the lines that should be shown to the user.
+     *
+     * @param command Command to process.
+     * @return Response lines for the command.
+     */
+    private List<String> processCommand(String command) {
+        List<String> responseLines = new ArrayList<>();
+        boolean hasTasksChanged = false;
+
+        try {
+            if (command.contains("|")) {
+                throw new BogosException("Bah! Bpipes ('|') banned!");
+            } else if (command.equals("list")) {
+                if (tasks.isEmpty()) {
+                    throw new BogosException("But board be blank...");
+                }
+                responseLines.add("Behold bulleted board:");
+                for (int i = 1; i <= tasks.size(); i++) {
+                    responseLines.add(i + "." + tasks.getTask(i));
+                }
+            } else if (command.startsWith("find ")) {
+                handleFindCommand(command, responseLines);
+            } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
+                handleMarkCommand(command, responseLines);
+                hasTasksChanged = true;
+            } else if (command.startsWith("delete ")) {
+                handleDeleteCommand(command, responseLines);
+                hasTasksChanged = true;
+            } else if (command.startsWith("todo ") || command.startsWith("deadline ")
+                    || command.startsWith("event ")) {
+                addTask(parser.parseTask(command), responseLines);
+                hasTasksChanged = true;
+            } else {
+                throw new BogosException("bwhat");
+            }
+
+            if (hasTasksChanged) {
+                storage.saveTasks(tasks.asList(), userInterface);
+            }
+        } catch (BogosException e) {
+            responseLines.add(e.getMessage());
+        }
+        return responseLines;
     }
 
     /**
@@ -90,7 +162,7 @@ public class Bogos {
      * @param command Mark or unmark command to process.
      * @throws BogosException If the task number is invalid or its status is unchanged.
      */
-    private static void handleMarkCommand(String command) throws BogosException {
+    private void handleMarkCommand(String command, List<String> responseLines) throws BogosException {
         boolean isMarkCommand = command.startsWith("mark");
         String taskNumberText = command.substring(isMarkCommand ? "mark ".length() : "unmark ".length()).trim();
         Task task = tasks.getTask(parser.parseTaskNumber(taskNumberText));
@@ -101,12 +173,12 @@ public class Bogos {
 
         if (isMarkCommand) {
             task.markAsDone();
-            userInterface.showMessage("Bravo! Bogos boxed bullet:");
+            responseLines.add("Bravo! Bogos boxed bullet:");
         } else {
             task.markAsNotDone();
-            userInterface.showMessage("Bet! Bogos blanked box:");
+            responseLines.add("Bet! Bogos blanked box:");
         }
-        userInterface.showMessage("  " + task);
+        responseLines.add("  " + task);
     }
 
     /**
@@ -115,12 +187,12 @@ public class Bogos {
      * @param command Delete command to process.
      * @throws BogosException If the task number is invalid.
      */
-    private static void handleDeleteCommand(String command) throws BogosException {
+    private void handleDeleteCommand(String command, List<String> responseLines) throws BogosException {
         String taskNumberText = command.substring("delete ".length()).trim();
         Task task = tasks.removeTask(parser.parseTaskNumber(taskNumberText));
-        userInterface.showMessage("Brilliant! Bye bye bullet:");
-        userInterface.showMessage("  " + task);
-        userInterface.showMessage(Integer.toString(tasks.size()) + " bullet(s) being.");
+        responseLines.add("Brilliant! Bye bye bullet:");
+        responseLines.add("  " + task);
+        responseLines.add(Integer.toString(tasks.size()) + " bullet(s) being.");
     }
 
     /**
@@ -129,16 +201,16 @@ public class Bogos {
      * @param command Find command to process.
      * @throws BogosException If the keyword is empty.
      */
-    private static void handleFindCommand(String command) throws BogosException {
+    private void handleFindCommand(String command, List<String> responseLines) throws BogosException {
         String keyword = command.substring("find ".length()).trim();
         if (keyword.isEmpty()) {
             throw new BogosException("bwhat keyword");
         }
 
         List<Task> matchingTasks = tasks.findTasks(keyword);
-        userInterface.showMessage("Bogos brings befitting bullets:");
+        responseLines.add("Bogos brings befitting bullets:");
         for (int i = 0; i < matchingTasks.size(); i++) {
-            userInterface.showMessage((i + 1) + "." + matchingTasks.get(i));
+            responseLines.add((i + 1) + "." + matchingTasks.get(i));
         }
     }
 
@@ -147,11 +219,11 @@ public class Bogos {
      *
      * @param newTask Task to add.
      */
-    private static void addTask(Task newTask) {
+    private void addTask(Task newTask, List<String> responseLines) {
         tasks.addTask(newTask);
-        userInterface.showMessage("Boom! Bullet born: ");
-        userInterface.showMessage("  " + newTask);
-        userInterface.showMessage(Integer.toString(tasks.size()) + " bullet(s) being.");
+        responseLines.add("Boom! Bullet born: ");
+        responseLines.add("  " + newTask);
+        responseLines.add(Integer.toString(tasks.size()) + " bullet(s) being.");
     }
 
 }
