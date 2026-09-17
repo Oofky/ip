@@ -50,6 +50,8 @@ public class Parser {
      * @throws BogosException If the command is invalid.
      */
     private Task parseDeadline(String command) throws BogosException {
+        assert command.startsWith("deadline ")
+                : "Deadline parsing is only reached for deadline commands.";
         int byIndex = command.indexOf(" /by ");
         if (byIndex < "deadline ".length()) {
             throw new BogosException("bwhat [deadline ... /by ...]");
@@ -68,6 +70,8 @@ public class Parser {
      * @throws BogosException If the command is invalid or its dates are reversed.
      */
     private Task parseEvent(String command) throws BogosException {
+        assert command.startsWith("event ")
+                : "Event parsing is only reached for event commands.";
         int fromIndex = command.indexOf(" /from ");
         int toIndex = command.indexOf(" /to ");
         if (fromIndex < "event ".length() || toIndex < fromIndex) {
