@@ -153,8 +153,7 @@ public class Bogos {
         } else if (command.startsWith("delete ")) {
             handleDeleteCommand(command, responseLines);
             return true;
-        } else if (command.startsWith("todo ") || command.startsWith("deadline ")
-                || command.startsWith("event ")) {
+        } else if (parser.isTaskCommand(command)) {
             addTask(parser.parseTask(command), responseLines);
             return true;
         } else {
