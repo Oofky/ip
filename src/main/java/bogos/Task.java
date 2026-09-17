@@ -1,9 +1,15 @@
 package bogos;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 /**
  * Represents a task with a type, description, and completion state.
  */
 public abstract class Task {
+    protected static final DateTimeFormatter DISPLAY_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
+
     private final String taskType;
     private final String description;
     private boolean isDone;

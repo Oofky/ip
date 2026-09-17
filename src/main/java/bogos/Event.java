@@ -1,15 +1,11 @@
 package bogos;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 /**
  * Represents an event task.
  */
 public class Event extends Task {
-    private static final DateTimeFormatter DISPLAY_DATE_FORMATTER =
-            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
     private final LocalDate startDate;
     private final LocalDate endDate;
 
