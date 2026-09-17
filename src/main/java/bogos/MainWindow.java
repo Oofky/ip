@@ -23,8 +23,8 @@ public class MainWindow extends AnchorPane {
     private Button sendButton;
 
     private Bogos bogos;
-    private final Image userImage = new Image(getClass().getResourceAsStream("/images/DaUser.png"));
-    private final Image bogosImage = new Image(getClass().getResourceAsStream("/images/DaDuke.png"));
+    private final Image userImage = new Image(getClass().getResourceAsStream("/images/photosprinted.png"));
+    private final Image bogosImage = new Image(getClass().getResourceAsStream("/images/bogosbinted.png"));
 
     /**
      * Keeps the latest dialog visible after a message is added.
