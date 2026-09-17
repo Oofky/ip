@@ -41,22 +41,37 @@ public class Storage {
         try (Scanner fileScanner = new Scanner(dataFile)) {
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
-                String[] parts = line.split(" \\| ", -1);
-
-                try {
-                    Task task = createTask(parts);
-                    if (Boolean.parseBoolean(parts[1])) {
-                        task.markAsDone();
-                    }
+                Task task = loadTask(line, userInterface);
+                if (task != null) {
                     tasks.add(task);
-                } catch (DateTimeParseException | IllegalArgumentException e) {
-                    userInterface.showMessage("Bad backup: " + line + ", bypassed");
                 }
             }
         } catch (FileNotFoundException e) {
             userInterface.showMessage("Bad boot: " + e.getMessage() + ", backup bypassed");
         }
         return tasks;
+    }
+
+    /**
+     * Loads one stored task record and reports malformed records through the UI.
+     *
+     * @param line Stored task record.
+     * @param userInterface UI used to report malformed task data.
+     * @return Task represented by the record, or {@code null} when the record is malformed.
+     */
+    private Task loadTask(String line, Ui userInterface) {
+        String[] parts = line.split(" \\| ", -1);
+
+        try {
+            Task task = createTask(parts);
+            if (Boolean.parseBoolean(parts[1])) {
+                task.markAsDone();
+            }
+            return task;
+        } catch (DateTimeParseException | IllegalArgumentException e) {
+            userInterface.showMessage("Bad backup: " + line + ", bypassed");
+            return null;
+        }
     }
 
     /**
