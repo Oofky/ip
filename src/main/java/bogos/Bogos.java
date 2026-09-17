@@ -118,35 +118,9 @@ public class Bogos {
      */
     private List<String> processCommand(String command) {
         List<String> responseLines = new ArrayList<>();
-        boolean hasTasksChanged = false;
 
         try {
-            if (command.contains("|")) {
-                throw new BogosException("Bah! Bpipes ('|') banned!");
-            } else if (command.equals("list")) {
-                if (tasks.isEmpty()) {
-                    throw new BogosException("But board be blank...");
-                }
-                responseLines.add("Behold bulleted board:");
-                for (int i = 1; i <= tasks.size(); i++) {
-                    responseLines.add(i + "." + tasks.getTask(i));
-                }
-            } else if (command.startsWith("find ")) {
-                handleFindCommand(command, responseLines);
-            } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
-                handleMarkCommand(command, responseLines);
-                hasTasksChanged = true;
-            } else if (command.startsWith("delete ")) {
-                handleDeleteCommand(command, responseLines);
-                hasTasksChanged = true;
-            } else if (command.startsWith("todo ") || command.startsWith("deadline ")
-                    || command.startsWith("event ")) {
-                addTask(parser.parseTask(command), responseLines);
-                hasTasksChanged = true;
-            } else {
-                throw new BogosException("bwhat");
-            }
-
+            boolean hasTasksChanged = executeCommand(command, responseLines);
             if (hasTasksChanged) {
                 storage.saveTasks(tasks.asList(), userInterface);
             }
@@ -154,6 +128,55 @@ public class Bogos {
             responseLines.add(e.getMessage());
         }
         return responseLines;
+    }
+
+    /**
+     * Executes a command and reports whether it changes the task list.
+     *
+     * @param command Command to execute.
+     * @param responseLines Lines to be shown to the user.
+     * @return Whether the command changed the task list.
+     * @throws BogosException If the command or its arguments are invalid.
+     */
+    private boolean executeCommand(String command, List<String> responseLines) throws BogosException {
+        if (command.contains("|")) {
+            throw new BogosException("Bah! Bpipes ('|') banned!");
+        } else if (command.equals("list")) {
+            handleListCommand(responseLines);
+            return false;
+        } else if (command.startsWith("find ")) {
+            handleFindCommand(command, responseLines);
+            return false;
+        } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
+            handleMarkCommand(command, responseLines);
+            return true;
+        } else if (command.startsWith("delete ")) {
+            handleDeleteCommand(command, responseLines);
+            return true;
+        } else if (command.startsWith("todo ") || command.startsWith("deadline ")
+                || command.startsWith("event ")) {
+            addTask(parser.parseTask(command), responseLines);
+            return true;
+        } else {
+            throw new BogosException("bwhat");
+        }
+    }
+
+    /**
+     * Adds the numbered task list to the response.
+     *
+     * @param responseLines Lines to be shown to the user.
+     * @throws BogosException If there are no tasks to list.
+     */
+    private void handleListCommand(List<String> responseLines) throws BogosException {
+        if (tasks.isEmpty()) {
+            throw new BogosException("But board be blank...");
+        }
+
+        responseLines.add("Behold bulleted board:");
+        for (int i = 1; i <= tasks.size(); i++) {
+            responseLines.add(i + "." + tasks.getTask(i));
+        }
     }
 
     /**
