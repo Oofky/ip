@@ -2,7 +2,6 @@ package bogos;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -19,9 +18,6 @@ public class MainWindow extends AnchorPane {
     private VBox dialogContainer;
     @FXML
     private TextField userInput;
-    @FXML
-    private Button sendButton;
-
     private Bogos bogos;
     private final Image userImage = new Image(getClass().getResourceAsStream("/images/photosprinted.png"));
     private final Image bogosImage = new Image(getClass().getResourceAsStream("/images/bogosbinted.png"));
