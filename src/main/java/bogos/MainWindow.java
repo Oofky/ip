@@ -1,5 +1,6 @@
 package bogos;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
@@ -7,11 +8,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 /**
  * Controls the main Bogos chat window.
  */
 public class MainWindow extends AnchorPane {
+    private static final Duration GOODBYE_DISPLAY_DURATION = Duration.seconds(1);
+
     @FXML
     private ScrollPane scrollPane;
     @FXML
@@ -55,7 +59,10 @@ public class MainWindow extends AnchorPane {
         userInput.clear();
 
         if (bogos.isExitCommand(input)) {
-            Platform.exit();
+            userInput.setDisable(true);
+            PauseTransition goodbyePause = new PauseTransition(GOODBYE_DISPLAY_DURATION);
+            goodbyePause.setOnFinished(event -> Platform.exit());
+            goodbyePause.play();
         }
     }
 }
