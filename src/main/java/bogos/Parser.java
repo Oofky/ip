@@ -10,6 +10,9 @@ public class Parser {
     private static final String TODO_COMMAND_PREFIX = "todo ";
     private static final String DEADLINE_COMMAND_PREFIX = "deadline ";
     private static final String EVENT_COMMAND_PREFIX = "event ";
+    private static final String DEADLINE_DATE_MARKER = " /by ";
+    private static final String EVENT_START_DATE_MARKER = " /from ";
+    private static final String EVENT_END_DATE_MARKER = " /to ";
 
     /**
      * Returns whether a command creates a task.
@@ -66,13 +69,13 @@ public class Parser {
      * @throws BogosException If the command is invalid.
      */
     private Task parseDeadline(String command) throws BogosException {
-        int byIndex = command.indexOf(" /by ");
+        int byIndex = command.indexOf(DEADLINE_DATE_MARKER);
         if (byIndex < DEADLINE_COMMAND_PREFIX.length()) {
             throw new BogosException("bwhat [deadline ... /by ...]");
         }
 
         String description = getRequiredText(command.substring(DEADLINE_COMMAND_PREFIX.length(), byIndex));
-        String by = getRequiredText(command.substring(byIndex + " /by ".length()));
+        String by = getRequiredText(command.substring(byIndex + DEADLINE_DATE_MARKER.length()));
         return new Deadline(description, parseDate(by));
     }
 
@@ -84,15 +87,15 @@ public class Parser {
      * @throws BogosException If the command is invalid or its dates are reversed.
      */
     private Task parseEvent(String command) throws BogosException {
-        int fromIndex = command.indexOf(" /from ");
-        int toIndex = command.indexOf(" /to ");
+        int fromIndex = command.indexOf(EVENT_START_DATE_MARKER);
+        int toIndex = command.indexOf(EVENT_END_DATE_MARKER);
         if (fromIndex < EVENT_COMMAND_PREFIX.length() || toIndex < fromIndex) {
             throw new BogosException("bwhat [event ... /from ... /to ...]");
         }
 
         String description = getRequiredText(command.substring(EVENT_COMMAND_PREFIX.length(), fromIndex));
-        String starting = getRequiredText(command.substring(fromIndex + " /from ".length(), toIndex));
-        String ending = getRequiredText(command.substring(toIndex + " /to ".length()));
+        String starting = getRequiredText(command.substring(fromIndex + EVENT_START_DATE_MARKER.length(), toIndex));
+        String ending = getRequiredText(command.substring(toIndex + EVENT_END_DATE_MARKER.length()));
         try {
             return new Event(description, parseDate(starting), parseDate(ending));
         } catch (IllegalArgumentException e) {
