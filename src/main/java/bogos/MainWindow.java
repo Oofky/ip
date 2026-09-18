@@ -23,6 +23,16 @@ public class MainWindow extends AnchorPane {
     private final Image bogosImage = new Image(getClass().getResourceAsStream("/images/bogosbinted.png"));
 
     /**
+     * Configures scrolling after FXML fields have been injected.
+     */
+    @FXML
+    public void initialize() {
+        dialogContainer.heightProperty().addListener((observable, oldHeight, newHeight) -> {
+            scrollPane.setVvalue(scrollPane.getVmax());
+        });
+    }
+
+    /**
      * Supplies the command-processing application used by this window.
      *
      * @param bogos Bogos application instance.
@@ -42,7 +52,6 @@ public class MainWindow extends AnchorPane {
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getBogosDialog(response, bogosImage));
-        Platform.runLater(() -> scrollPane.setVvalue(1.0));
         userInput.clear();
 
         if (bogos.isExitCommand(input)) {
