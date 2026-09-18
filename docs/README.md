@@ -45,9 +45,7 @@ the task.
   you are unsure which number to use.
 - Keep command punctuation as shown: `/by`, `/from`, and `/to` appear once
   each in their respective commands. The `|` character is not supported.
-- Surrounding whitespace and repeated spaces are treated as a single space.
-  Bogos does not add a task whose type, details, dates, and tags match an
-  existing task; tag order and completion status do not affect this check.
+- Bogos does not add duplicate tasks with the same details.
 
 That is all you need—add a task whenever it occurs to you, and let Bogos keep
 the bullets together.
