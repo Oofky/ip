@@ -48,7 +48,7 @@ public class Bogos {
             String command = consoleUi.readCommand();
             consoleUi.showDivider();
 
-            if (command.equals("bye")) {
+            if (bogos.isExitCommand(command)) {
                 consoleUi.showGoodbye();
                 consoleUi.showDivider();
                 break;
