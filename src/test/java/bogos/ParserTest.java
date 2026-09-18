@@ -188,7 +188,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("todo watch movie #fun #fun"));
 
-        assertEquals("bwhat duplicate tag", exception.getMessage());
+        assertEquals("bwhat buplicate tag", exception.getMessage());
     }
 
     /**
@@ -285,6 +285,19 @@ public class ParserTest {
     }
 
     /**
+     * Verifies that a deadline command cannot specify its due-date parameter twice.
+     */
+    @Test
+    public void parseTask_deadlineWithRepeatedBy_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("deadline submit report /by 2026-09-15 /by 2026-09-16"));
+
+        assertEquals("bwhat buplicate /by", exception.getMessage());
+    }
+
+    /**
      * Verifies that an event command requires its start-date marker.
      */
     @Test
@@ -360,6 +373,34 @@ public class ParserTest {
                 () -> parser.parseTask("event project meeting /from tomorrow /to 2026-09-16"));
 
         assertEquals("bwhat [yyyy-mm-dd]", exception.getMessage());
+    }
+
+    /**
+     * Verifies that an event command cannot specify its start-date parameter twice.
+     */
+    @Test
+    public void parseTask_eventWithRepeatedFrom_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("event project meeting /from 2026-09-15"
+                        + " /from 2026-09-16 /to 2026-09-17"));
+
+        assertEquals("bwhat buplicate /from", exception.getMessage());
+    }
+
+    /**
+     * Verifies that an event command cannot specify its end-date parameter twice.
+     */
+    @Test
+    public void parseTask_eventWithRepeatedTo_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("event project meeting /from 2026-09-15"
+                        + " /to 2026-09-16 /to 2026-09-17"));
+
+        assertEquals("bwhat buplicate /to", exception.getMessage());
     }
 
     /**

@@ -80,6 +80,10 @@ public class Parser {
     private Task parseDeadline(String command, List<String> tags) throws BogosException {
         assert command.startsWith("deadline ")
                 : "Deadline parsing is only reached for deadline commands.";
+        if (countParameterOccurrences(command, "/by") > 1) {
+            throw new BogosException("bwhat buplicate /by");
+        }
+
         int byIndex = command.indexOf(DEADLINE_DATE_MARKER);
         if (byIndex < DEADLINE_COMMAND_PREFIX.length()) {
             throw new BogosException("bwhat [deadline ... /by ...]");
@@ -101,6 +105,13 @@ public class Parser {
     private Task parseEvent(String command, List<String> tags) throws BogosException {
         assert command.startsWith("event ")
                 : "Event parsing is only reached for event commands.";
+        if (countParameterOccurrences(command, "/from") > 1) {
+            throw new BogosException("bwhat buplicate /from");
+        }
+        if (countParameterOccurrences(command, "/to") > 1) {
+            throw new BogosException("bwhat buplicate /to");
+        }
+
         int fromIndex = command.indexOf(EVENT_START_DATE_MARKER);
         int toIndex = command.indexOf(EVENT_END_DATE_MARKER);
         if (fromIndex < EVENT_COMMAND_PREFIX.length() || toIndex < fromIndex) {
@@ -148,6 +159,25 @@ public class Parser {
     }
 
     /**
+     * Counts occurrences of a parameter token in a command.
+     *
+     * @param command Command containing zero or more parameter tokens.
+     * @param parameter Parameter token to count.
+     * @return Number of occurrences of the parameter token.
+     */
+    private int countParameterOccurrences(String command, String parameter) {
+        int occurrenceCount = 0;
+        String[] tokens = command.split("\\s+");
+
+        for (String token : tokens) {
+            if (token.equals(parameter)) {
+                occurrenceCount++;
+            }
+        }
+        return occurrenceCount;
+    }
+
+    /**
      * Separates inline tag tokens from a task command.
      *
      * @param command Raw task command.
@@ -173,7 +203,7 @@ public class Parser {
                 throw new BogosException("bwhat tag");
             }
             if (!uniqueTags.add(tag)) {
-                throw new BogosException("bwhat duplicate tag");
+                throw new BogosException("bwhat buplicate tag");
             }
             tags.add(tag);
         }
