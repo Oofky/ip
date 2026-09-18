@@ -45,7 +45,7 @@ public class Bogos {
         consoleUi.showWelcome();
 
         while (consoleUi.hasNextCommand()) {
-            String command = consoleUi.readCommand();
+            String command = normalizeCommand(consoleUi.readCommand());
             consoleUi.showDivider();
 
             if (bogos.isExitCommand(command)) {
@@ -84,7 +84,7 @@ public class Bogos {
      * @return True if the command is {@code bye}.
      */
     public boolean isExitCommand(String command) {
-        return command.equals("bye");
+        return normalizeCommand(command).equals("bye");
     }
 
     /**
@@ -94,20 +94,31 @@ public class Bogos {
      * @return Response text, possibly spanning multiple lines.
      */
     public String getResponse(String command) {
+        String normalizedCommand = normalizeCommand(command);
         List<String> responseLines;
         userInterface.showDivider();
 
-        if (isExitCommand(command)) {
+        if (isExitCommand(normalizedCommand)) {
             responseLines = List.of("Bye bye! :]");
             userInterface.showGoodbye();
         } else {
-            responseLines = processCommand(command);
+            responseLines = processCommand(normalizedCommand);
             for (String responseLine : responseLines) {
                 userInterface.showMessage(responseLine);
             }
         }
         userInterface.showDivider();
         return String.join(System.lineSeparator(), responseLines);
+    }
+
+    /**
+     * Removes surrounding whitespace and reduces each internal whitespace run to one space.
+     *
+     * @param command Raw command entered by the user.
+     * @return Command in the format used by command parsing.
+     */
+    static String normalizeCommand(String command) {
+        return command.trim().replaceAll("\\s+", " ");
     }
 
     /**
@@ -247,7 +258,7 @@ public class Bogos {
      *
      * @param newTask Task to add.
      */
-    private void addTask(Task newTask, List<String> responseLines) {
+    private void addTask(Task newTask, List<String> responseLines) throws BogosException {
         tasks.addTask(newTask);
         responseLines.add("Boom! Bullet born: ");
         responseLines.add("  " + newTask);

@@ -52,16 +52,18 @@ ____________________________________________________________
 
 ### Aim
 
-Verify that to-dos, deadlines, and events are added with their type-specific details and that tags appear in task displays.
+Verify that whitespace is normalized for task creation, all task types are added
+with their type-specific details, and duplicate tasks are rejected.
 
 ### Inputs
 
 ```text
-todo borrow book #reading #Fun
+  todo   borrow   book   #reading   #Fun
 deadline return book /by 2026-09-05
 event project meeting /from 2026-09-05 /to 2026-09-06
 list
 find book
+todo borrow book #Fun #reading
 bye
 ```
 
@@ -101,6 +103,9 @@ ____________________________________________________________
          Bogos brings befitting bullets:
          1.[T][ ] borrow book #reading #Fun
          2.[D][ ] return book (by: Sep 05 2026)
+____________________________________________________________
+____________________________________________________________
+         bwhat buplicate bullet
 ____________________________________________________________
 ____________________________________________________________
          Bye bye! :]
@@ -229,7 +234,8 @@ ____________________________________________________________
 
 ### Aim
 
-Verify that commands with repeated date parameters are rejected without creating tasks.
+Verify that commands with repeated date parameters or same-day event dates are
+rejected without creating tasks.
 
 ### Inputs
 
@@ -237,6 +243,7 @@ Verify that commands with repeated date parameters are rejected without creating
 deadline submit report /by 2026-09-15 /by 2026-09-16
 event project meeting /from 2026-09-15 /from 2026-09-16 /to 2026-09-17
 event project meeting /from 2026-09-15 /to 2026-09-16 /to 2026-09-17
+event same day /from 2026-09-17 /to 2026-09-17
 bye
 ```
 
@@ -259,6 +266,9 @@ ____________________________________________________________
 ____________________________________________________________
 ____________________________________________________________
          bwhat buplicate /to
+____________________________________________________________
+____________________________________________________________
+         Bro be breathing backwards??
 ____________________________________________________________
 ____________________________________________________________
          Bye bye! :]

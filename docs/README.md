@@ -25,7 +25,7 @@ the task.
 | --- | --- | --- |
 | Add a to-do | `todo DESCRIPTION [#TAG]...` | `todo buy milk #errands` |
 | Add a deadline | `deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...` | `deadline submit report /by 2026-09-30 #school` |
-| Add an event | `event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...` | `event team meeting /from 2026-10-02 /to 2026-10-02 #work` |
+| Add an event | `event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...` | `event team meeting /from 2026-10-02 /to 2026-10-03 #work` |
 | See all tasks | `list` | `list` |
 | Search task descriptions | `find KEYWORD` | `find report` |
 | Complete a task | `mark NUMBER` | `mark 2` |
@@ -36,7 +36,7 @@ the task.
 ## A few helpful details
 
 - Dates must use the format `YYYY-MM-DD`, for example `2026-09-30`. An event's
-  end date cannot be before its start date.
+  end date must be later than its start date.
 - Add optional tags to any new task with `#`, such as `#school` or `#urgent`.
   Tags must be unique within that task and cannot contain spaces.
 - `find` ignores letter case and searches task descriptions, not tags. It keeps
@@ -45,6 +45,7 @@ the task.
   you are unsure which number to use.
 - Keep command punctuation as shown: `/by`, `/from`, and `/to` appear once
   each in their respective commands. The `|` character is not supported.
+- Bogos does not add duplicate tasks with the same details.
 
 That is all you need—add a task whenever it occurs to you, and let Bogos keep
 the bullets together.

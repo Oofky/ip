@@ -353,11 +353,24 @@ public class ParserTest {
      * Verifies that an event cannot end before it starts.
      */
     @Test
-    public void parseTask_eventWithReverseDates_exceptionThrown() {
+    public void parseTask_eventWithEndDateNotAfterStartDate_exceptionThrown() {
         Parser parser = new Parser();
 
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("event project meeting /from 2026-09-16 /to 2026-09-15"));
+
+        assertEquals("Bro be breathing backwards??", exception.getMessage());
+    }
+
+    /**
+     * Verifies that an event cannot end on the same date on which it starts.
+     */
+    @Test
+    public void parseTask_eventWithSameDates_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("event project meeting /from 2026-09-15 /to 2026-09-15"));
 
         assertEquals("Bro be breathing backwards??", exception.getMessage());
     }
@@ -441,5 +454,13 @@ public class ParserTest {
                 () -> parser.parseTaskNumber("one"));
 
         assertEquals("Bogus. Bring Bogos base-ten. :[", exception.getMessage());
+    }
+
+    /**
+     * Verifies that command normalization removes surrounding and repeated whitespace.
+     */
+    @Test
+    public void normalizeCommand_commandWithExtraWhitespace_returnsSingleSpacedCommand() {
+        assertEquals("todo buy milk #errands", Bogos.normalizeCommand("  todo   buy   milk   #errands  "));
     }
 }
