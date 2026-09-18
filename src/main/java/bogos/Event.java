@@ -1,15 +1,11 @@
 package bogos;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 /**
  * Represents an event task.
  */
 public class Event extends Task {
-    private static final DateTimeFormatter DISPLAY_DATE_FORMATTER =
-            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
     private final LocalDate startDate;
     private final LocalDate endDate;
 
@@ -22,7 +18,7 @@ public class Event extends Task {
      * @throws IllegalArgumentException If the description is blank or the end precedes the start.
      */
     public Event(String description, LocalDate startDate, LocalDate endDate) {
-        super("E", description);
+        super(TaskType.EVENT, description);
         if (endDate.isBefore(startDate)) {
             throw new IllegalArgumentException("Event end date cannot be before its start date.");
         }

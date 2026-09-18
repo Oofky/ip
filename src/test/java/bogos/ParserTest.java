@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 
@@ -13,6 +14,28 @@ import org.junit.jupiter.api.Test;
  * Tests for converting user commands into tasks and task numbers.
  */
 public class ParserTest {
+    /**
+     * Verifies that all task-command prefixes are classified as task commands.
+     */
+    @Test
+    public void isTaskCommand_taskCommands_returnsTrue() {
+        Parser parser = new Parser();
+
+        assertTrue(parser.isTaskCommand("todo read book"));
+        assertTrue(parser.isTaskCommand("deadline submit report /by 2026-09-15"));
+        assertTrue(parser.isTaskCommand("event project meeting /from 2026-09-15 /to 2026-09-16"));
+    }
+
+    /**
+     * Verifies that a non-task command is not classified as a task command.
+     */
+    @Test
+    public void isTaskCommand_nonTaskCommand_returnsFalse() {
+        Parser parser = new Parser();
+
+        assertFalse(parser.isTaskCommand("list"));
+    }
+
     /**
      * Verifies that a valid to-do command creates an incomplete to-do.
      *

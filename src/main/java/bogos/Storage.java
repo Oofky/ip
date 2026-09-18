@@ -15,6 +15,16 @@ import java.util.Scanner;
  * Loads tasks from and saves tasks to the application's data file.
  */
 public class Storage {
+    private static final int TYPE_INDEX = 0;
+    private static final int STATUS_INDEX = 1;
+    private static final int DESCRIPTION_INDEX = 2;
+    private static final int DATE_INDEX = 3;
+    private static final int END_DATE_INDEX = 4;
+
+    private static final int TODO_FIELD_COUNT = 3;
+    private static final int DEADLINE_FIELD_COUNT = 4;
+    private static final int EVENT_FIELD_COUNT = 5;
+
     private final File dataFile;
 
     /**
@@ -41,22 +51,37 @@ public class Storage {
         try (Scanner fileScanner = new Scanner(dataFile)) {
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
-                String[] parts = line.split(" \\| ", -1);
-
-                try {
-                    Task task = createTask(parts);
-                    if (Boolean.parseBoolean(parts[1])) {
-                        task.markAsDone();
-                    }
+                Task task = loadTask(line, userInterface);
+                if (task != null) {
                     tasks.add(task);
-                } catch (DateTimeParseException | IllegalArgumentException e) {
-                    userInterface.showMessage("Bad backup: " + line + ", bypassed");
                 }
             }
         } catch (FileNotFoundException e) {
             userInterface.showMessage("Bad boot: " + e.getMessage() + ", backup bypassed");
         }
         return tasks;
+    }
+
+    /**
+     * Loads one stored task record and reports malformed records through the UI.
+     *
+     * @param line Stored task record.
+     * @param userInterface UI used to report malformed task data.
+     * @return Task represented by the record, or {@code null} when the record is malformed.
+     */
+    private Task loadTask(String line, Ui userInterface) {
+        String[] parts = line.split(" \\| ", -1);
+
+        try {
+            Task task = createTask(parts);
+            if (Boolean.parseBoolean(parts[STATUS_INDEX])) {
+                task.markAsDone();
+            }
+            return task;
+        } catch (DateTimeParseException | IllegalArgumentException e) {
+            userInterface.showMessage("Bad backup: " + line + ", bypassed");
+            return null;
+        }
     }
 
     /**
@@ -87,27 +112,28 @@ public class Storage {
      * @throws IllegalArgumentException If the record is malformed or has an unknown type.
      */
     private Task createTask(String[] parts) {
-        if (parts.length < 3) {
+        if (parts.length < TODO_FIELD_COUNT) {
             throw new IllegalArgumentException("Too few fields for task.");
         }
-        if (!parts[1].equals("true") && !parts[1].equals("false")) {
+        if (!parts[STATUS_INDEX].equals("true") && !parts[STATUS_INDEX].equals("false")) {
             throw new IllegalArgumentException("Invalid isDone status.");
         }
 
-        return switch (parts[0]) {
-        case "T" -> {
-            verifyFieldCount(parts, 3);
-            yield new Todo(parts[2]);
+        TaskType taskType = TaskType.fromStorageCode(parts[TYPE_INDEX]);
+        return switch (taskType) {
+        case TODO -> {
+            verifyFieldCount(parts, TODO_FIELD_COUNT);
+            yield new Todo(parts[DESCRIPTION_INDEX]);
         }
-        case "D" -> {
-            verifyFieldCount(parts, 4);
-            yield new Deadline(parts[2], LocalDate.parse(parts[3]));
+        case DEADLINE -> {
+            verifyFieldCount(parts, DEADLINE_FIELD_COUNT);
+            yield new Deadline(parts[DESCRIPTION_INDEX], LocalDate.parse(parts[DATE_INDEX]));
         }
-        case "E" -> {
-            verifyFieldCount(parts, 5);
-            yield new Event(parts[2], LocalDate.parse(parts[3]), LocalDate.parse(parts[4]));
+        case EVENT -> {
+            verifyFieldCount(parts, EVENT_FIELD_COUNT);
+            yield new Event(parts[DESCRIPTION_INDEX], LocalDate.parse(parts[DATE_INDEX]),
+                    LocalDate.parse(parts[END_DATE_INDEX]));
         }
-        default -> throw new IllegalArgumentException("Unknown task type.");
         };
     }
 

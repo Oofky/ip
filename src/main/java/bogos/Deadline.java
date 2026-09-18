@@ -1,15 +1,11 @@
 package bogos;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 /**
  * Represents a deadline task.
  */
 public class Deadline extends Task {
-    private static final DateTimeFormatter DISPLAY_DATE_FORMATTER =
-            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
     private final LocalDate dueDate;
 
     /**
@@ -20,7 +16,7 @@ public class Deadline extends Task {
      * @throws IllegalArgumentException If the description is blank.
      */
     public Deadline(String description, LocalDate dueDate) {
-        super("D", description);
+        super(TaskType.DEADLINE, description);
         this.dueDate = dueDate;
     }
 
