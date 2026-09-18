@@ -15,6 +15,16 @@ import java.util.Scanner;
  * Loads tasks from and saves tasks to the application's data file.
  */
 public class Storage {
+    private static final int TYPE_INDEX = 0;
+    private static final int STATUS_INDEX = 1;
+    private static final int DESCRIPTION_INDEX = 2;
+    private static final int DATE_INDEX = 3;
+    private static final int END_DATE_INDEX = 4;
+
+    private static final int TODO_FIELD_COUNT = 3;
+    private static final int DEADLINE_FIELD_COUNT = 4;
+    private static final int EVENT_FIELD_COUNT = 5;
+
     private final File dataFile;
 
     /**
@@ -64,7 +74,7 @@ public class Storage {
 
         try {
             Task task = createTask(parts);
-            if (Boolean.parseBoolean(parts[1])) {
+            if (Boolean.parseBoolean(parts[STATUS_INDEX])) {
                 task.markAsDone();
             }
             return task;
@@ -102,26 +112,27 @@ public class Storage {
      * @throws IllegalArgumentException If the record is malformed or has an unknown type.
      */
     private Task createTask(String[] parts) {
-        if (parts.length < 3) {
+        if (parts.length < TODO_FIELD_COUNT) {
             throw new IllegalArgumentException("Too few fields for task.");
         }
-        if (!parts[1].equals("true") && !parts[1].equals("false")) {
+        if (!parts[STATUS_INDEX].equals("true") && !parts[STATUS_INDEX].equals("false")) {
             throw new IllegalArgumentException("Invalid isDone status.");
         }
 
-        TaskType taskType = TaskType.fromStorageCode(parts[0]);
+        TaskType taskType = TaskType.fromStorageCode(parts[TYPE_INDEX]);
         return switch (taskType) {
         case TODO -> {
-            verifyFieldCount(parts, 3);
-            yield new Todo(parts[2]);
+            verifyFieldCount(parts, TODO_FIELD_COUNT);
+            yield new Todo(parts[DESCRIPTION_INDEX]);
         }
         case DEADLINE -> {
-            verifyFieldCount(parts, 4);
-            yield new Deadline(parts[2], LocalDate.parse(parts[3]));
+            verifyFieldCount(parts, DEADLINE_FIELD_COUNT);
+            yield new Deadline(parts[DESCRIPTION_INDEX], LocalDate.parse(parts[DATE_INDEX]));
         }
         case EVENT -> {
-            verifyFieldCount(parts, 5);
-            yield new Event(parts[2], LocalDate.parse(parts[3]), LocalDate.parse(parts[4]));
+            verifyFieldCount(parts, EVENT_FIELD_COUNT);
+            yield new Event(parts[DESCRIPTION_INDEX], LocalDate.parse(parts[DATE_INDEX]),
+                    LocalDate.parse(parts[END_DATE_INDEX]));
         }
         };
     }
