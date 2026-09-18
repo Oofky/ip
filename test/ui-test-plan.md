@@ -4,7 +4,7 @@
 
 - Java version: 25
 - Compile command: `javac -d _temp/ui-test-classes src/main/java/bogos/Bogos.java src/main/java/bogos/BogosException.java src/main/java/bogos/Deadline.java src/main/java/bogos/Event.java src/main/java/bogos/Parser.java src/main/java/bogos/Storage.java src/main/java/bogos/Task.java src/main/java/bogos/TaskList.java src/main/java/bogos/TaskType.java src/main/java/bogos/Todo.java src/main/java/bogos/Ui.java`
-- Run command: `java -cp _temp/ui-test-classes bogos.Bogos`
+- Run command: `java -ea -cp _temp/ui-test-classes bogos.Bogos`
 
 Run the planned sessions from the repository root with:
 

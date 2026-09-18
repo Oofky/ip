@@ -69,6 +69,8 @@ public class Parser {
      * @throws BogosException If the command is invalid.
      */
     private Task parseDeadline(String command) throws BogosException {
+        assert command.startsWith("deadline ")
+                : "Deadline parsing is only reached for deadline commands.";
         int byIndex = command.indexOf(DEADLINE_DATE_MARKER);
         if (byIndex < DEADLINE_COMMAND_PREFIX.length()) {
             throw new BogosException("bwhat [deadline ... /by ...]");
@@ -87,6 +89,8 @@ public class Parser {
      * @throws BogosException If the command is invalid or its dates are reversed.
      */
     private Task parseEvent(String command) throws BogosException {
+        assert command.startsWith("event ")
+                : "Event parsing is only reached for event commands.";
         int fromIndex = command.indexOf(EVENT_START_DATE_MARKER);
         int toIndex = command.indexOf(EVENT_END_DATE_MARKER);
         if (fromIndex < EVENT_COMMAND_PREFIX.length() || toIndex < fromIndex) {

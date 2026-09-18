@@ -185,6 +185,8 @@ public class Bogos {
      * @throws BogosException If the task number is invalid or its status is unchanged.
      */
     private void handleMarkCommand(String command, List<String> responseLines) throws BogosException {
+        assert command.startsWith("mark ") || command.startsWith("unmark ")
+                : "Only mark and unmark commands are routed to the mark handler.";
         boolean isMarkCommand = command.startsWith("mark");
         String taskNumberText = command.substring(isMarkCommand ? "mark ".length() : "unmark ".length()).trim();
         Task task = tasks.getTask(parser.parseTaskNumber(taskNumberText));
@@ -195,9 +197,11 @@ public class Bogos {
 
         if (isMarkCommand) {
             task.markAsDone();
+            assert task.isDone() : "Marking a task must set its completion state.";
             responseLines.add("Bravo! Bogos boxed bullet:");
         } else {
             task.markAsNotDone();
+            assert !task.isDone() : "Unmarking a task must clear its completion state.";
             responseLines.add("Bet! Bogos blanked box:");
         }
         responseLines.add("  " + task);
@@ -210,6 +214,8 @@ public class Bogos {
      * @throws BogosException If the task number is invalid.
      */
     private void handleDeleteCommand(String command, List<String> responseLines) throws BogosException {
+        assert command.startsWith("delete ")
+                : "Only delete commands are routed to the delete handler.";
         String taskNumberText = command.substring("delete ".length()).trim();
         Task task = tasks.removeTask(parser.parseTaskNumber(taskNumberText));
         responseLines.add("Brilliant! Bye bye bullet:");

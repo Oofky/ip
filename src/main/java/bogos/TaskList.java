@@ -70,8 +70,11 @@ public class TaskList {
      * @throws BogosException If the task number is outside the list.
      */
     public Task removeTask(int taskNumber) throws BogosException {
+        int originalSize = tasks.size();
         Task task = getTask(taskNumber);
         tasks.remove(task);
+        assert tasks.size() == originalSize - 1
+                : "Removing one task must reduce the task list size by one.";
         return task;
     }
 
