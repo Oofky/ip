@@ -11,6 +11,6 @@ public class Todo extends Task {
      * @throws IllegalArgumentException If the description is blank.
      */
     public Todo(String description) {
-        super("T", description);
+        super(TaskType.TODO, description);
     }
 }

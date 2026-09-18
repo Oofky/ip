@@ -18,7 +18,7 @@ public class Event extends Task {
      * @throws IllegalArgumentException If the description is blank or the end precedes the start.
      */
     public Event(String description, LocalDate startDate, LocalDate endDate) {
-        super("E", description);
+        super(TaskType.EVENT, description);
         if (endDate.isBefore(startDate)) {
             throw new IllegalArgumentException("Event end date cannot be before its start date.");
         }

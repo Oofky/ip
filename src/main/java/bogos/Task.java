@@ -10,18 +10,18 @@ public abstract class Task {
     protected static final DateTimeFormatter DISPLAY_DATE_FORMATTER =
             DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
 
-    private final String taskType;
+    private final TaskType taskType;
     private final String description;
     private boolean isDone;
 
     /**
      * Creates an incomplete task of the supplied type and description.
      *
-     * @param taskType Single-letter identifier for the task type.
+     * @param taskType Type of this task.
      * @param description Description of the task.
      * @throws IllegalArgumentException If the description is blank.
      */
-    protected Task(String taskType, String description) {
+    protected Task(TaskType taskType, String description) {
         if (description.isBlank()) {
             throw new IllegalArgumentException("Task description cannot be empty.");
         }
@@ -30,7 +30,7 @@ public abstract class Task {
         this.isDone = false;
     }
 
-    public String getTaskType() {
+    public TaskType getTaskType() {
         return taskType;
     }
 
@@ -67,7 +67,7 @@ public abstract class Task {
      */
     @Override
     public String toString() {
-        return "[" + getTaskType() + "][" + getStatusIcon() + "] "
+        return "[" + getTaskType().getStorageCode() + "][" + getStatusIcon() + "] "
                 + getDescription();
     }
 
@@ -77,7 +77,7 @@ public abstract class Task {
      * @return Data-file representation of this task.
      */
     public String toFileFormat() {
-        return getTaskType()
+        return getTaskType().getStorageCode()
                 + " | " + (isDone() ? "true" : "false")
                 + " | " + getDescription();
     }

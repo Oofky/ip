@@ -109,20 +109,20 @@ public class Storage {
             throw new IllegalArgumentException("Invalid isDone status.");
         }
 
-        return switch (parts[0]) {
-        case "T" -> {
+        TaskType taskType = TaskType.fromStorageCode(parts[0]);
+        return switch (taskType) {
+        case TODO -> {
             verifyFieldCount(parts, 3);
             yield new Todo(parts[2]);
         }
-        case "D" -> {
+        case DEADLINE -> {
             verifyFieldCount(parts, 4);
             yield new Deadline(parts[2], LocalDate.parse(parts[3]));
         }
-        case "E" -> {
+        case EVENT -> {
             verifyFieldCount(parts, 5);
             yield new Event(parts[2], LocalDate.parse(parts[3]), LocalDate.parse(parts[4]));
         }
-        default -> throw new IllegalArgumentException("Unknown task type.");
         };
     }
 

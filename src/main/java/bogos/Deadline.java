@@ -16,7 +16,7 @@ public class Deadline extends Task {
      * @throws IllegalArgumentException If the description is blank.
      */
     public Deadline(String description, LocalDate dueDate) {
-        super("D", description);
+        super(TaskType.DEADLINE, description);
         this.dueDate = dueDate;
     }
 
