@@ -23,14 +23,6 @@ public class MainWindow extends AnchorPane {
     private final Image bogosImage = new Image(getClass().getResourceAsStream("/images/bogosbinted.png"));
 
     /**
-     * Keeps the latest dialog visible after a message is added.
-     */
-    @FXML
-    public void initialize() {
-        scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
-    }
-
-    /**
      * Supplies the command-processing application used by this window.
      *
      * @param bogos Bogos application instance.
@@ -50,6 +42,7 @@ public class MainWindow extends AnchorPane {
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getBogosDialog(response, bogosImage));
+        Platform.runLater(() -> scrollPane.setVvalue(1.0));
         userInput.clear();
 
         if (bogos.isExitCommand(input)) {
