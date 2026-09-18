@@ -1,6 +1,7 @@
 package bogos;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -47,5 +48,22 @@ public class TaskListTest {
         List<Task> matchingTasks = tasks.findTasks("fun");
 
         assertEquals(List.of(), matchingTasks);
+    }
+
+    /**
+     * Verifies that a task with the same details is not added twice, even when tag order differs.
+     */
+    @Test
+    public void addTask_duplicateTaskWithDifferentTagOrder_exceptionThrown() throws BogosException {
+        TaskList tasks = new TaskList();
+        tasks.addTask(new Deadline("submit report", LocalDate.of(2026, 9, 15),
+                List.of("school", "urgent")));
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> tasks.addTask(new Deadline("submit report", LocalDate.of(2026, 9, 15),
+                        List.of("urgent", "school"))));
+
+        assertEquals("bwhat buplicate bullet", exception.getMessage());
+        assertEquals(1, tasks.size());
     }
 }

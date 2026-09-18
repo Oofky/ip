@@ -1,6 +1,7 @@
 package bogos;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,9 +44,54 @@ public class TaskList {
      * Adds a task to this list.
      *
      * @param task Task to add.
+     * @throws BogosException If a task with the same user-supplied details already exists.
      */
-    public void addTask(Task task) {
+    public void addTask(Task task) throws BogosException {
+        if (containsTaskWithSameDetails(task)) {
+            throw new BogosException("bwhat buplicate bullet");
+        }
         tasks.add(task);
+    }
+
+    /**
+     * Returns whether this list contains a task with the same user-supplied details.
+     * Completion status is excluded because it does not distinguish two tasks that
+     * represent the same work.
+     *
+     * @param candidate Task to compare with tasks in this list.
+     * @return Whether an equivalent task already exists.
+     */
+    private boolean containsTaskWithSameDetails(Task candidate) {
+        for (Task existingTask : tasks) {
+            if (hasSameDetails(existingTask, candidate)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns whether two tasks have the same type, description, tags, and dates.
+     *
+     * @param firstTask First task to compare.
+     * @param secondTask Second task to compare.
+     * @return Whether both tasks describe the same work.
+     */
+    private boolean hasSameDetails(Task firstTask, Task secondTask) {
+        if (firstTask.getTaskType() != secondTask.getTaskType()
+                || !firstTask.getDescription().equals(secondTask.getDescription())
+                || !new HashSet<>(firstTask.getTags()).equals(new HashSet<>(secondTask.getTags()))) {
+            return false;
+        }
+
+        return switch (firstTask.getTaskType()) {
+        case TODO -> true;
+        case DEADLINE -> ((Deadline) firstTask).getDueDate()
+                .equals(((Deadline) secondTask).getDueDate());
+        case EVENT -> ((Event) firstTask).getStartDate()
+                .equals(((Event) secondTask).getStartDate())
+                && ((Event) firstTask).getEndDate().equals(((Event) secondTask).getEndDate());
+        };
     }
 
     /**

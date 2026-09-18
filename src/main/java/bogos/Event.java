@@ -16,7 +16,7 @@ public class Event extends Task {
      * @param description Description of the event.
      * @param startDate Date on which the event starts.
      * @param endDate Date on which the event ends.
-     * @throws IllegalArgumentException If the description is blank or the end precedes the start.
+     * @throws IllegalArgumentException If the description is blank or the end is not after the start.
      */
     public Event(String description, LocalDate startDate, LocalDate endDate) {
         this(description, startDate, endDate, List.of());
@@ -33,8 +33,8 @@ public class Event extends Task {
      */
     public Event(String description, LocalDate startDate, LocalDate endDate, List<String> tags) {
         super(TaskType.EVENT, description, tags);
-        if (endDate.isBefore(startDate)) {
-            throw new IllegalArgumentException("Event end date cannot be before its start date.");
+        if (!endDate.isAfter(startDate)) {
+            throw new IllegalArgumentException("Event end date must be after its start date.");
         }
         this.startDate = startDate;
         this.endDate = endDate;
