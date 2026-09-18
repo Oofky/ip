@@ -1,6 +1,7 @@
 package bogos;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Represents a deadline task.
@@ -16,7 +17,19 @@ public class Deadline extends Task {
      * @throws IllegalArgumentException If the description is blank.
      */
     public Deadline(String description, LocalDate dueDate) {
-        super(TaskType.DEADLINE, description);
+        this(description, dueDate, List.of());
+    }
+
+    /**
+     * Creates an incomplete deadline with the given description, due date, and tags.
+     *
+     * @param description Description of the deadline.
+     * @param dueDate Due date of the deadline.
+     * @param tags Tags assigned to the deadline.
+     * @throws IllegalArgumentException If the description or a tag is invalid.
+     */
+    public Deadline(String description, LocalDate dueDate, List<String> tags) {
+        super(TaskType.DEADLINE, description, tags);
         this.dueDate = dueDate;
     }
 
@@ -40,8 +53,8 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        return super.toString()
-                + " (by: " + getFormattedDueDate() + ")";
+        return appendTags(getBasicDisplayFormat()
+                + " (by: " + getFormattedDueDate() + ")");
     }
 
     /**
@@ -51,7 +64,6 @@ public class Deadline extends Task {
      */
     @Override
     public String toFileFormat() {
-        return super.toFileFormat()
-                + " | " + getDueDate();
+        return appendTags(getBasicFileFormat() + " | " + getDueDate());
     }
 }

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -53,6 +54,22 @@ public class ParserTest {
     }
 
     /**
+     * Verifies that inline tags are extracted in input order and omitted from a to-do description.
+     *
+     * @throws BogosException If the valid command cannot be parsed.
+     */
+    @Test
+    public void parseTask_todoWithTags_success() throws BogosException {
+        Parser parser = new Parser();
+
+        Todo todo = assertInstanceOf(Todo.class, parser.parseTask("todo watch movie #fun #weekend"));
+
+        assertEquals("watch movie", todo.getDescription());
+        assertEquals(List.of("fun", "weekend"), todo.getTags());
+        assertEquals("[T][ ] watch movie #fun #weekend", todo.toString());
+    }
+
+    /**
      * Verifies that a valid deadline command creates an incomplete deadline.
      *
      * @throws BogosException If the valid command cannot be parsed.
@@ -67,6 +84,23 @@ public class ParserTest {
         assertEquals("submit report", deadline.getDescription());
         assertEquals(LocalDate.of(2026, 9, 15), deadline.getDueDate());
         assertFalse(deadline.isDone());
+    }
+
+    /**
+     * Verifies that tags may appear before a deadline's date marker.
+     *
+     * @throws BogosException If the valid command cannot be parsed.
+     */
+    @Test
+    public void parseTask_deadlineWithTagsBeforeDateMarker_success() throws BogosException {
+        Parser parser = new Parser();
+
+        Deadline deadline = assertInstanceOf(Deadline.class,
+                parser.parseTask("deadline submit report #school /by 2026-09-15"));
+
+        assertEquals("submit report", deadline.getDescription());
+        assertEquals(List.of("school"), deadline.getTags());
+        assertEquals("[D][ ] submit report (by: Sep 15 2026) #school", deadline.toString());
     }
 
     /**
@@ -85,6 +119,24 @@ public class ParserTest {
         assertEquals(LocalDate.of(2026, 9, 15), event.getStartDate());
         assertEquals(LocalDate.of(2026, 9, 16), event.getEndDate());
         assertFalse(event.isDone());
+    }
+
+    /**
+     * Verifies that tags may appear between an event's date markers and after its end date.
+     *
+     * @throws BogosException If the valid command cannot be parsed.
+     */
+    @Test
+    public void parseTask_eventWithTagsAroundDates_success() throws BogosException {
+        Parser parser = new Parser();
+
+        Event event = assertInstanceOf(Event.class,
+                parser.parseTask("event project meeting /from #team 2026-09-15 /to 2026-09-16 #Fun"));
+
+        assertEquals("project meeting", event.getDescription());
+        assertEquals(List.of("team", "Fun"), event.getTags());
+        assertEquals("[E][ ] project meeting (from: Sep 15 2026 to: Sep 16 2026) #team #Fun",
+                event.toString());
     }
 
     /**
@@ -109,6 +161,59 @@ public class ParserTest {
 
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("todo "));
+
+        assertEquals("bwhat body", exception.getMessage());
+    }
+
+    /**
+     * Verifies that a tag without text produces a tag error.
+     */
+    @Test
+    public void parseTask_todoWithBlankTag_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("todo watch movie #"));
+
+        assertEquals("bwhat tag", exception.getMessage());
+    }
+
+    /**
+     * Verifies that repeated case-sensitive tags produce a duplicate-tag error.
+     */
+    @Test
+    public void parseTask_todoWithDuplicateTags_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("todo watch movie #fun #fun"));
+
+        assertEquals("bwhat duplicate tag", exception.getMessage());
+    }
+
+    /**
+     * Verifies that differently capitalised tags are distinct.
+     *
+     * @throws BogosException If the valid command cannot be parsed.
+     */
+    @Test
+    public void parseTask_todoWithDifferentlyCapitalisedTags_success() throws BogosException {
+        Parser parser = new Parser();
+
+        Todo todo = assertInstanceOf(Todo.class, parser.parseTask("todo watch movie #Fun #fun"));
+
+        assertEquals(List.of("Fun", "fun"), todo.getTags());
+    }
+
+    /**
+     * Verifies that removing tags cannot leave a blank task description.
+     */
+    @Test
+    public void parseTask_todoWithOnlyTags_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("todo #fun #weekend"));
 
         assertEquals("bwhat body", exception.getMessage());
     }

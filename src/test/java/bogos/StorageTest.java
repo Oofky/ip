@@ -37,15 +37,17 @@ public class StorageTest {
         todo.markAsDone();
         List<Task> tasks = List.of(
                 todo,
-                new Deadline("return book", LocalDate.of(2026, 9, 15)),
-                new Event("project meeting", LocalDate.of(2026, 9, 15), LocalDate.of(2026, 9, 16)));
+                new Deadline("return book", LocalDate.of(2026, 9, 15), List.of("library")),
+                new Event("project meeting", LocalDate.of(2026, 9, 15), LocalDate.of(2026, 9, 16),
+                        List.of("CS2103", "team-a")));
 
         storage.saveTasks(tasks, new Ui());
 
         assertEquals(List.of(
                 "T | true | borrow book",
-                "D | false | return book | 2026-09-15",
-                "E | false | project meeting | 2026-09-15 | 2026-09-16"), Files.readAllLines(file));
+                "D | false | return book | 2026-09-15 | library",
+                "E | false | project meeting | 2026-09-15 | 2026-09-16 | CS2103 | team-a"),
+                Files.readAllLines(file));
     }
 
     /**
@@ -58,23 +60,26 @@ public class StorageTest {
         Path file = temporaryDirectory.resolve("bogos.txt");
         Files.write(file, List.of(
                 "T | false | borrow book",
-                "D | false | return book | 2026-09-15",
-                "E | false | project meeting | 2026-09-15 | 2026-09-16"));
+                "D | false | return book | 2026-09-15 | library",
+                "E | false | project meeting | 2026-09-15 | 2026-09-16 | CS2103 | team-a"));
         Storage storage = new Storage(file);
 
         List<Task> tasks = storage.loadTasks(new Ui());
 
         assertEquals(3, tasks.size());
         assertEquals("borrow book", tasks.get(0).getDescription());
+        assertEquals(List.of(), tasks.get(0).getTags());
 
         Deadline deadline = assertInstanceOf(Deadline.class, tasks.get(1));
         assertEquals("return book", deadline.getDescription());
         assertEquals(LocalDate.of(2026, 9, 15), deadline.getDueDate());
+        assertEquals(List.of("library"), deadline.getTags());
 
         Event event = assertInstanceOf(Event.class, tasks.get(2));
         assertEquals("project meeting", event.getDescription());
         assertEquals(LocalDate.of(2026, 9, 15), event.getStartDate());
         assertEquals(LocalDate.of(2026, 9, 16), event.getEndDate());
+        assertEquals(List.of("CS2103", "team-a"), event.getTags());
     }
 
     /**
@@ -125,5 +130,40 @@ public class StorageTest {
         Todo todo = assertInstanceOf(Todo.class, tasks.get(0));
         assertEquals("borrow book", todo.getDescription());
         assertFalse(todo.isDone());
+    }
+
+    /**
+     * Verifies that a record containing an empty tag is skipped in full.
+     *
+     * @throws IOException If the test cannot write the temporary data file.
+     */
+    @Test
+    public void loadTasks_withEmptyTag_skipsInvalidRecord() throws IOException {
+        Path file = temporaryDirectory.resolve("bogos.txt");
+        Files.write(file, List.of(
+                "T | false | borrow book | reading",
+                "D | false | return book | 2026-09-15 | "));
+        Storage storage = new Storage(file);
+
+        List<Task> tasks = storage.loadTasks(new Ui());
+
+        assertEquals(1, tasks.size());
+        assertEquals(List.of("reading"), tasks.get(0).getTags());
+    }
+
+    /**
+     * Verifies that a record containing duplicate tags is skipped in full.
+     *
+     * @throws IOException If the test cannot write the temporary data file.
+     */
+    @Test
+    public void loadTasks_withDuplicateTags_skipsInvalidRecord() throws IOException {
+        Path file = temporaryDirectory.resolve("bogos.txt");
+        Files.write(file, List.of("T | false | borrow book | reading | reading"));
+        Storage storage = new Storage(file);
+
+        List<Task> tasks = storage.loadTasks(new Ui());
+
+        assertTrue(tasks.isEmpty());
     }
 }

@@ -36,4 +36,16 @@ public class TaskListTest {
 
         assertEquals(List.of(), matchingTasks);
     }
+
+    /**
+     * Verifies that finding tasks continues to search descriptions rather than tags.
+     */
+    @Test
+    public void findTasks_matchingOnlyTag_returnsEmptyList() {
+        TaskList tasks = new TaskList(List.of(new Todo("watch movie", List.of("fun"))));
+
+        List<Task> matchingTasks = tasks.findTasks("fun");
+
+        assertEquals(List.of(), matchingTasks);
+    }
 }

@@ -21,9 +21,9 @@ public class Storage {
     private static final int DATE_INDEX = 3;
     private static final int END_DATE_INDEX = 4;
 
-    private static final int TODO_FIELD_COUNT = 3;
-    private static final int DEADLINE_FIELD_COUNT = 4;
-    private static final int EVENT_FIELD_COUNT = 5;
+    private static final int TODO_BASE_FIELD_COUNT = 3;
+    private static final int DEADLINE_BASE_FIELD_COUNT = 4;
+    private static final int EVENT_BASE_FIELD_COUNT = 5;
 
     private final File dataFile;
 
@@ -112,7 +112,7 @@ public class Storage {
      * @throws IllegalArgumentException If the record is malformed or has an unknown type.
      */
     private Task createTask(String[] parts) {
-        if (parts.length < TODO_FIELD_COUNT) {
+        if (parts.length < TODO_BASE_FIELD_COUNT) {
             throw new IllegalArgumentException("Too few fields for task.");
         }
         if (!parts[STATUS_INDEX].equals("true") && !parts[STATUS_INDEX].equals("false")) {
@@ -122,31 +122,47 @@ public class Storage {
         TaskType taskType = TaskType.fromStorageCode(parts[TYPE_INDEX]);
         return switch (taskType) {
         case TODO -> {
-            verifyFieldCount(parts, TODO_FIELD_COUNT);
-            yield new Todo(parts[DESCRIPTION_INDEX]);
+            verifyMinimumFieldCount(parts, TODO_BASE_FIELD_COUNT);
+            yield new Todo(parts[DESCRIPTION_INDEX], getTags(parts, TODO_BASE_FIELD_COUNT));
         }
         case DEADLINE -> {
-            verifyFieldCount(parts, DEADLINE_FIELD_COUNT);
-            yield new Deadline(parts[DESCRIPTION_INDEX], LocalDate.parse(parts[DATE_INDEX]));
+            verifyMinimumFieldCount(parts, DEADLINE_BASE_FIELD_COUNT);
+            yield new Deadline(parts[DESCRIPTION_INDEX], LocalDate.parse(parts[DATE_INDEX]),
+                    getTags(parts, DEADLINE_BASE_FIELD_COUNT));
         }
         case EVENT -> {
-            verifyFieldCount(parts, EVENT_FIELD_COUNT);
+            verifyMinimumFieldCount(parts, EVENT_BASE_FIELD_COUNT);
             yield new Event(parts[DESCRIPTION_INDEX], LocalDate.parse(parts[DATE_INDEX]),
-                    LocalDate.parse(parts[END_DATE_INDEX]));
+                    LocalDate.parse(parts[END_DATE_INDEX]), getTags(parts, EVENT_BASE_FIELD_COUNT));
         }
         };
     }
 
     /**
-     * Verifies that a stored task record has the expected number of fields.
+     * Verifies that a stored task record has at least its required base fields.
      *
      * @param parts Fields from a stored task record.
-     * @param expectedCount Required number of fields.
-     * @throws IllegalArgumentException If the record has the wrong number of fields.
+     * @param expectedCount Required number of base fields.
+     * @throws IllegalArgumentException If the record has too few fields.
      */
-    private void verifyFieldCount(String[] parts, int expectedCount) {
-        if (parts.length != expectedCount) {
-            throw new IllegalArgumentException("Wrong number of fields for task type.");
+    private void verifyMinimumFieldCount(String[] parts, int expectedCount) {
+        if (parts.length < expectedCount) {
+            throw new IllegalArgumentException("Too few fields for task type.");
         }
+    }
+
+    /**
+     * Returns stored tags after a task's required fields.
+     *
+     * @param parts Fields from a stored task record.
+     * @param firstTagIndex Index of the first optional tag field.
+     * @return Tags in stored order.
+     */
+    private List<String> getTags(String[] parts, int firstTagIndex) {
+        List<String> tags = new ArrayList<>();
+        for (int index = firstTagIndex; index < parts.length; index++) {
+            tags.add(parts[index]);
+        }
+        return tags;
     }
 }

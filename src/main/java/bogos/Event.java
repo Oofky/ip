@@ -1,6 +1,7 @@
 package bogos;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Represents an event task.
@@ -18,7 +19,20 @@ public class Event extends Task {
      * @throws IllegalArgumentException If the description is blank or the end precedes the start.
      */
     public Event(String description, LocalDate startDate, LocalDate endDate) {
-        super(TaskType.EVENT, description);
+        this(description, startDate, endDate, List.of());
+    }
+
+    /**
+     * Creates an incomplete event with the given description, dates, and tags.
+     *
+     * @param description Description of the event.
+     * @param startDate Date on which the event starts.
+     * @param endDate Date on which the event ends.
+     * @param tags Tags assigned to the event.
+     * @throws IllegalArgumentException If the description, dates, or tags are invalid.
+     */
+    public Event(String description, LocalDate startDate, LocalDate endDate, List<String> tags) {
+        super(TaskType.EVENT, description, tags);
         if (endDate.isBefore(startDate)) {
             throw new IllegalArgumentException("Event end date cannot be before its start date.");
         }
@@ -59,9 +73,9 @@ public class Event extends Task {
      */
     @Override
     public String toString() {
-        return super.toString()
+        return appendTags(getBasicDisplayFormat()
                 + " (from: " + getFormattedStartDate()
-                + " to: " + getFormattedEndDate() + ")";
+                + " to: " + getFormattedEndDate() + ")");
     }
 
     /**
@@ -71,8 +85,8 @@ public class Event extends Task {
      */
     @Override
     public String toFileFormat() {
-        return super.toFileFormat()
+        return appendTags(getBasicFileFormat()
                 + " | " + getStartDate()
-                + " | " + getEndDate();
+                + " | " + getEndDate());
     }
 }

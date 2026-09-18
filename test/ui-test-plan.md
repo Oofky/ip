@@ -52,12 +52,12 @@ ____________________________________________________________
 
 ### Aim
 
-Verify that to-dos, deadlines, and events are added with their type-specific details and shown in the list.
+Verify that to-dos, deadlines, and events are added with their type-specific details and that tags appear in task displays.
 
 ### Inputs
 
 ```text
-todo borrow book
+todo borrow book #reading #Fun
 deadline return book /by 2026-09-05
 event project meeting /from 2026-09-05 /to 2026-09-06
 list
@@ -78,7 +78,7 @@ ____________________________________________________________
 Blessings! Bogos beckons. Bring Bogos business? :]
 ____________________________________________________________
          Boom! Bullet born: 
-           [T][ ] borrow book
+           [T][ ] borrow book #reading #Fun
          1 bullet(s) being.
 ____________________________________________________________
 ____________________________________________________________
@@ -93,14 +93,54 @@ ____________________________________________________________
 ____________________________________________________________
 ____________________________________________________________
          Behold bulleted board:
-         1.[T][ ] borrow book
+         1.[T][ ] borrow book #reading #Fun
          2.[D][ ] return book (by: Sep 05 2026)
          3.[E][ ] project meeting (from: Sep 05 2026 to: Sep 06 2026)
 ____________________________________________________________
 ____________________________________________________________
          Bogos brings befitting bullets:
-         1.[T][ ] borrow book
+         1.[T][ ] borrow book #reading #Fun
          2.[D][ ] return book (by: Sep 05 2026)
+____________________________________________________________
+____________________________________________________________
+         Bye bye! :]
+____________________________________________________________
+```
+
+## Test case: Reject invalid task tags
+
+### Aim
+
+Verify that blank, duplicate, and description-only tag commands are rejected without creating tasks.
+
+### Inputs
+
+```text
+todo watch movie #
+todo watch movie #fun #fun
+todo #fun #weekend
+bye
+```
+
+### Expected output
+
+```text
+      ___             __ _
+     | _ )    ___    / _` |   ___     ___
+     | _ \   / _ \   \__, |  / _ \   (_-<
+     |___/   \___/   |___/   \___/   /__/_
+   _|"""""|_|"""""|_|"""""|_|"""""|_|"""""|
+   "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'
+____________________________________________________________
+Blessings! Bogos beckons. Bring Bogos business? :]
+____________________________________________________________
+         bwhat tag
+____________________________________________________________
+____________________________________________________________
+         bwhat duplicate tag
+____________________________________________________________
+____________________________________________________________
+         bwhat body
 ____________________________________________________________
 ____________________________________________________________
          Bye bye! :]
@@ -136,11 +176,11 @@ ____________________________________________________________
 Blessings! Bogos beckons. Bring Bogos business? :]
 ____________________________________________________________
          Bravo! Bogos boxed bullet:
-           [T][X] borrow book
+           [T][X] borrow book #reading #Fun
 ____________________________________________________________
 ____________________________________________________________
          Bet! Bogos blanked box:
-           [T][ ] borrow book
+           [T][ ] borrow book #reading #Fun
 ____________________________________________________________
 ____________________________________________________________
          Brilliant! Bye bye bullet:
@@ -149,7 +189,7 @@ ____________________________________________________________
 ____________________________________________________________
 ____________________________________________________________
          Behold bulleted board:
-         1.[T][ ] borrow book
+         1.[T][ ] borrow book #reading #Fun
          2.[E][ ] project meeting (from: Sep 05 2026 to: Sep 06 2026)
 ____________________________________________________________
 ____________________________________________________________
