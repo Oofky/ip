@@ -27,11 +27,11 @@
         <Button fx:id="sendButton" mnemonicParsing="false" onAction="#handleUserInput" prefHeight="48.0"
                 prefWidth="76.0" text="Beam it" styleClass="send-button"
                 AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="16.0" />
-        <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" hvalue="1.0" vvalue="1.0"
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" hvalue="1.0" vvalue="1.0"
                     styleClass="chat-scroll-pane" AnchorPane.bottomAnchor="74.0" AnchorPane.leftAnchor="0.0"
                     AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="90.0">
             <content>
-                <VBox fx:id="dialogContainer" prefWidth="468.0" styleClass="dialog-container" />
+                <VBox fx:id="dialogContainer" styleClass="dialog-container" />
             </content>
         </ScrollPane>
     </children>

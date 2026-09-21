@@ -13,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
 /**
  * Displays a speaker image beside a text message.
@@ -34,6 +35,9 @@ public class DialogBox extends HBox {
         }
 
         dialog.setText(text);
+        dialog.setMinWidth(0);
+        dialog.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(dialog, Priority.ALWAYS);
         displayPicture.setImage(image);
     }
 
