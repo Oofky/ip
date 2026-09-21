@@ -23,6 +23,7 @@ public class MainWindow extends AnchorPane {
     @FXML
     private TextField userInput;
     private Bogos bogos;
+    private boolean isScrollToBottomRequested;
     private final Image userImage = new Image(getClass().getResourceAsStream("/images/photosprinted.png"));
     private final Image bogosImage = new Image(getClass().getResourceAsStream("/images/bogosbinted.png"));
 
@@ -32,7 +33,7 @@ public class MainWindow extends AnchorPane {
     @FXML
     public void initialize() {
         dialogContainer.heightProperty().addListener((observable, oldHeight, newHeight) -> {
-            scrollPane.setVvalue(scrollPane.getVmax());
+            scrollToBottomIfRequested();
         });
     }
 
@@ -43,7 +44,7 @@ public class MainWindow extends AnchorPane {
      */
     public void setBogos(Bogos bogos) {
         this.bogos = bogos;
-        dialogContainer.getChildren().add(DialogBox.getBogosDialog(bogos.getWelcomeMessage(), bogosImage));
+        addDialogs(DialogBox.getBogosDialog(bogos.getWelcomeMessage(), bogosImage));
     }
 
     /**
@@ -53,7 +54,7 @@ public class MainWindow extends AnchorPane {
     private void handleUserInput() {
         String input = userInput.getText();
         String response = bogos.getResponse(input);
-        dialogContainer.getChildren().addAll(
+        addDialogs(
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getBogosDialog(response, bogosImage));
         userInput.clear();
@@ -63,6 +64,26 @@ public class MainWindow extends AnchorPane {
             PauseTransition goodbyePause = new PauseTransition(GOODBYE_DISPLAY_DURATION);
             goodbyePause.setOnFinished(event -> Platform.exit());
             goodbyePause.play();
+        }
+    }
+
+    /**
+     * Adds dialogs and requests that their completed layout be shown.
+     *
+     * @param dialogs Dialogs to add to the conversation history.
+     */
+    private void addDialogs(DialogBox... dialogs) {
+        isScrollToBottomRequested = true;
+        dialogContainer.getChildren().addAll(dialogs);
+    }
+
+    /**
+     * Scrolls to the latest dialog only after an added dialog changes the content height.
+     */
+    private void scrollToBottomIfRequested() {
+        if (isScrollToBottomRequested) {
+            scrollPane.setVvalue(scrollPane.getVmax());
+            isScrollToBottomRequested = false;
         }
     }
 }
