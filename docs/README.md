@@ -38,7 +38,9 @@ the task.
 - Dates must use the format `YYYY-MM-DD`, for example `2026-09-30`. An event's
   end date must be later than its start date.
 - Add optional tags to any new task with `#`, such as `#school` or `#urgent`.
-  Tags must be unique within that task and cannot contain spaces.
+  Tags must be unique within that task and end at the next space. Text after a
+  space is treated as part of the description, so `todo spacetag #two words`
+  creates a task with the description `spacetag words` and the tag `#two`.
 - `find` ignores letter case and searches task descriptions, not tags. It keeps
   the matching tasks in their original order.
 - Task numbers start at 1 and can change after you delete a task—run `list` if
