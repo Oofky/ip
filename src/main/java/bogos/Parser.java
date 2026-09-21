@@ -25,8 +25,11 @@ public class Parser {
      * @return Whether the command is a to-do, deadline, or event command.
      */
     public boolean isTaskCommand(String command) {
-        return command.startsWith(TODO_COMMAND_PREFIX)
+        return command.equals("todo")
+                || command.startsWith(TODO_COMMAND_PREFIX)
+                || command.equals("deadline")
                 || command.startsWith(DEADLINE_COMMAND_PREFIX)
+                || command.equals("event")
                 || command.startsWith(EVENT_COMMAND_PREFIX);
     }
 
@@ -38,15 +41,31 @@ public class Parser {
      * @throws BogosException If the command is not a valid task command.
      */
     public Task parseTask(String command) throws BogosException {
+        if (command.equals("todo")) {
+            throw new BogosException("bwhat [todo body]");
+        }
+        if (command.equals("deadline")) {
+            throw new BogosException("bwhat [deadline body]");
+        }
+        if (command.equals("event")) {
+            throw new BogosException("bwhat [event body]");
+        }
+
         ParsedTaskInput parsedInput = extractTags(command);
         String commandWithoutTags = parsedInput.commandWithoutTags();
         List<String> tags = parsedInput.tags();
 
         if (commandWithoutTags.equals("todo") || commandWithoutTags.startsWith(TODO_COMMAND_PREFIX)) {
-            return new Todo(getRequiredText(commandWithoutTags.substring("todo".length())), tags);
+            return new Todo(getRequiredTodoDescription(commandWithoutTags.substring("todo".length())), tags);
+        }
+        if (commandWithoutTags.equals("deadline")) {
+            throw new BogosException("bwhat [deadline body]");
         }
         if (commandWithoutTags.startsWith(DEADLINE_COMMAND_PREFIX)) {
             return parseDeadline(commandWithoutTags, tags);
+        }
+        if (commandWithoutTags.equals("event")) {
+            throw new BogosException("bwhat [event body]");
         }
         if (commandWithoutTags.startsWith(EVENT_COMMAND_PREFIX)) {
             return parseEvent(commandWithoutTags, tags);
@@ -89,8 +108,9 @@ public class Parser {
             throw new BogosException("bwhat [deadline ... /by ...]");
         }
 
-        String description = getRequiredText(command.substring(DEADLINE_COMMAND_PREFIX.length(), byIndex));
-        String by = getRequiredText(command.substring(byIndex + DEADLINE_DATE_MARKER.length()));
+        String description = getRequiredDeadlineDescription(
+                command.substring(DEADLINE_COMMAND_PREFIX.length(), byIndex));
+        String by = getRequiredDeadlineDescription(command.substring(byIndex + DEADLINE_DATE_MARKER.length()));
         return new Deadline(description, parseDate(by), tags);
     }
 
@@ -118,9 +138,11 @@ public class Parser {
             throw new BogosException("bwhat [event ... /from ... /to ...]");
         }
 
-        String description = getRequiredText(command.substring(EVENT_COMMAND_PREFIX.length(), fromIndex));
-        String starting = getRequiredText(command.substring(fromIndex + EVENT_START_DATE_MARKER.length(), toIndex));
-        String ending = getRequiredText(command.substring(toIndex + EVENT_END_DATE_MARKER.length()));
+        String description = getRequiredEventDescription(
+                command.substring(EVENT_COMMAND_PREFIX.length(), fromIndex));
+        String starting = getRequiredEventDescription(
+                command.substring(fromIndex + EVENT_START_DATE_MARKER.length(), toIndex));
+        String ending = getRequiredEventDescription(command.substring(toIndex + EVENT_END_DATE_MARKER.length()));
         try {
             return new Event(description, parseDate(starting), parseDate(ending), tags);
         } catch (IllegalArgumentException e) {
@@ -141,6 +163,51 @@ public class Parser {
             throw new BogosException("bwhat body");
         }
         return trimmedText;
+    }
+
+    /**
+     * Returns a non-blank to-do description or its command-specific usage error.
+     *
+     * @param descriptionText Text to validate and trim.
+     * @return Trimmed non-blank to-do description.
+     * @throws BogosException If the description is blank.
+     */
+    private String getRequiredTodoDescription(String descriptionText) throws BogosException {
+        String trimmedDescription = descriptionText.trim();
+        if (trimmedDescription.isBlank()) {
+            throw new BogosException("bwhat [todo body]");
+        }
+        return trimmedDescription;
+    }
+
+    /**
+     * Returns a non-blank deadline description or its command-specific usage error.
+     *
+     * @param descriptionText Text to validate and trim.
+     * @return Trimmed non-blank deadline description.
+     * @throws BogosException If the description is blank.
+     */
+    private String getRequiredDeadlineDescription(String descriptionText) throws BogosException {
+        String trimmedDescription = descriptionText.trim();
+        if (trimmedDescription.isBlank()) {
+            throw new BogosException("bwhat [deadline body]");
+        }
+        return trimmedDescription;
+    }
+
+    /**
+     * Returns a non-blank event description or its command-specific usage error.
+     *
+     * @param descriptionText Text to validate and trim.
+     * @return Trimmed non-blank event description.
+     * @throws BogosException If the description is blank.
+     */
+    private String getRequiredEventDescription(String descriptionText) throws BogosException {
+        String trimmedDescription = descriptionText.trim();
+        if (trimmedDescription.isBlank()) {
+            throw new BogosException("bwhat [event body]");
+        }
+        return trimmedDescription;
     }
 
     /**

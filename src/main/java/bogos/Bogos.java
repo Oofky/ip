@@ -155,13 +155,14 @@ public class Bogos {
         } else if (command.equals("list")) {
             handleListCommand(responseLines);
             return false;
-        } else if (command.startsWith("find ")) {
+        } else if (command.equals("find") || command.startsWith("find ")) {
             handleFindCommand(command, responseLines);
             return false;
-        } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
+        } else if (command.equals("mark") || command.startsWith("mark ")
+                || command.equals("unmark") || command.startsWith("unmark ")) {
             handleMarkCommand(command, responseLines);
             return true;
-        } else if (command.startsWith("delete ")) {
+        } else if (command.equals("delete") || command.startsWith("delete ")) {
             handleDeleteCommand(command, responseLines);
             return true;
         } else if (parser.isTaskCommand(command)) {
@@ -196,10 +197,14 @@ public class Bogos {
      * @throws BogosException If the task number is invalid or its status is unchanged.
      */
     private void handleMarkCommand(String command, List<String> responseLines) throws BogosException {
-        assert command.startsWith("mark ") || command.startsWith("unmark ")
+        assert command.equals("mark") || command.startsWith("mark ")
+                || command.equals("unmark") || command.startsWith("unmark ")
                 : "Only mark and unmark commands are routed to the mark handler.";
-        boolean isMarkCommand = command.startsWith("mark");
-        String taskNumberText = command.substring(isMarkCommand ? "mark ".length() : "unmark ".length()).trim();
+        boolean isMarkCommand = command.equals("mark") || command.startsWith("mark ");
+        String taskNumberText = command.substring(isMarkCommand ? "mark".length() : "unmark".length()).trim();
+        if (taskNumberText.isEmpty()) {
+            throw new BogosException(isMarkCommand ? "bwhat [mark base-ten]" : "bwhat [unmark base-ten]");
+        }
         Task task = tasks.getTask(parser.parseTaskNumber(taskNumberText));
 
         if (task.isDone() == isMarkCommand) {
@@ -225,9 +230,12 @@ public class Bogos {
      * @throws BogosException If the task number is invalid.
      */
     private void handleDeleteCommand(String command, List<String> responseLines) throws BogosException {
-        assert command.startsWith("delete ")
+        assert command.equals("delete") || command.startsWith("delete ")
                 : "Only delete commands are routed to the delete handler.";
-        String taskNumberText = command.substring("delete ".length()).trim();
+        String taskNumberText = command.substring("delete".length()).trim();
+        if (taskNumberText.isEmpty()) {
+            throw new BogosException("bwhat [delete base-ten]");
+        }
         Task task = tasks.removeTask(parser.parseTaskNumber(taskNumberText));
         responseLines.add("Brilliant! Bye bye bullet:");
         responseLines.add("  " + task);
@@ -241,9 +249,9 @@ public class Bogos {
      * @throws BogosException If the keyword is empty.
      */
     private void handleFindCommand(String command, List<String> responseLines) throws BogosException {
-        String keyword = command.substring("find ".length()).trim();
+        String keyword = command.substring("find".length()).trim();
         if (keyword.isEmpty()) {
-            throw new BogosException("bwhat keyword");
+            throw new BogosException("bwhat [find buzzword]");
         }
 
         List<Task> matchingTasks = tasks.findTasks(keyword);

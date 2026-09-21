@@ -23,8 +23,11 @@ public class ParserTest {
         Parser parser = new Parser();
 
         assertTrue(parser.isTaskCommand("todo read book"));
+        assertTrue(parser.isTaskCommand("todo"));
         assertTrue(parser.isTaskCommand("deadline submit report /by 2026-09-15"));
+        assertTrue(parser.isTaskCommand("deadline"));
         assertTrue(parser.isTaskCommand("event project meeting /from 2026-09-15 /to 2026-09-16"));
+        assertTrue(parser.isTaskCommand("event"));
     }
 
     /**
@@ -162,7 +165,46 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("todo "));
 
-        assertEquals("bwhat body", exception.getMessage());
+        assertEquals("bwhat [todo body]", exception.getMessage());
+    }
+
+    /**
+     * Verifies that a bare to-do command provides its required usage.
+     */
+    @Test
+    public void parseTask_bareTodo_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("todo"));
+
+        assertEquals("bwhat [todo body]", exception.getMessage());
+    }
+
+    /**
+     * Verifies that a bare deadline command provides its required usage.
+     */
+    @Test
+    public void parseTask_bareDeadline_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("deadline"));
+
+        assertEquals("bwhat [deadline body]", exception.getMessage());
+    }
+
+    /**
+     * Verifies that a bare event command provides its required usage.
+     */
+    @Test
+    public void parseTask_bareEvent_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("event"));
+
+        assertEquals("bwhat [event body]", exception.getMessage());
     }
 
     /**
@@ -215,7 +257,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("todo #fun #weekend"));
 
-        assertEquals("bwhat body", exception.getMessage());
+        assertEquals("bwhat [todo body]", exception.getMessage());
     }
 
     /**
@@ -255,7 +297,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("deadline submit report /by "));
 
-        assertEquals("bwhat body", exception.getMessage());
+        assertEquals("bwhat [deadline body]", exception.getMessage());
     }
 
     /**
@@ -268,7 +310,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("deadline  /by 2026-09-15"));
 
-        assertEquals("bwhat body", exception.getMessage());
+        assertEquals("bwhat [deadline body]", exception.getMessage());
     }
 
     /**
@@ -320,7 +362,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("event project meeting /from  /to 2026-09-16"));
 
-        assertEquals("bwhat body", exception.getMessage());
+        assertEquals("bwhat [event body]", exception.getMessage());
     }
 
     /**
@@ -346,7 +388,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("event project meeting /from 2026-09-15 /to "));
 
-        assertEquals("bwhat body", exception.getMessage());
+        assertEquals("bwhat [event body]", exception.getMessage());
     }
 
     /**
