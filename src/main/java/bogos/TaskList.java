@@ -48,7 +48,7 @@ public class TaskList {
      */
     public void addTask(Task task) throws BogosException {
         if (containsTaskWithSameDetails(task)) {
-            throw new BogosException("bwhat buplicate bullet");
+            throw new BogosException("Bummer, buplicate bullet. :[");
         }
         tasks.add(task);
     }

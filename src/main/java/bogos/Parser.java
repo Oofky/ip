@@ -17,6 +17,17 @@ public class Parser {
     private static final String DEADLINE_DATE_MARKER = " /by ";
     private static final String EVENT_START_DATE_MARKER = " /from ";
     private static final String EVENT_END_DATE_MARKER = " /to ";
+    private static final String TODO_BODY_ERROR = "Bwhere body? Be: todo DESCRIPTION [#TAG]...";
+    private static final String DEADLINE_BODY_ERROR =
+            "Bwhere body? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...";
+    private static final String EVENT_BODY_ERROR =
+            "Bwhere body? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...";
+    private static final String DEADLINE_BY_ERROR =
+            "Bwhere /by? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...";
+    private static final String EVENT_FROM_ERROR =
+            "Bwhere /from? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...";
+    private static final String EVENT_TO_ERROR =
+            "Bwhere /to? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...";
 
     /**
      * Returns whether a command creates a task.
@@ -42,13 +53,13 @@ public class Parser {
      */
     public Task parseTask(String command) throws BogosException {
         if (command.equals("todo")) {
-            throw new BogosException("bwhat [todo body]");
+            throw new BogosException(TODO_BODY_ERROR);
         }
         if (command.equals("deadline")) {
-            throw new BogosException("bwhat [deadline body]");
+            throw new BogosException(DEADLINE_BODY_ERROR);
         }
         if (command.equals("event")) {
-            throw new BogosException("bwhat [event body]");
+            throw new BogosException(EVENT_BODY_ERROR);
         }
 
         ParsedTaskInput parsedInput = extractTags(command);
@@ -59,18 +70,18 @@ public class Parser {
             return new Todo(getRequiredTodoDescription(commandWithoutTags.substring("todo".length())), tags);
         }
         if (commandWithoutTags.equals("deadline")) {
-            throw new BogosException("bwhat [deadline body]");
+            throw new BogosException(DEADLINE_BODY_ERROR);
         }
         if (commandWithoutTags.startsWith(DEADLINE_COMMAND_PREFIX)) {
             return parseDeadline(commandWithoutTags, tags);
         }
         if (commandWithoutTags.equals("event")) {
-            throw new BogosException("bwhat [event body]");
+            throw new BogosException(EVENT_BODY_ERROR);
         }
         if (commandWithoutTags.startsWith(EVENT_COMMAND_PREFIX)) {
             return parseEvent(commandWithoutTags, tags);
         }
-        throw new BogosException("bwhat");
+        throw new BogosException("Bwhat? Best browse: help");
     }
 
     /**
@@ -99,18 +110,25 @@ public class Parser {
     private Task parseDeadline(String command, List<String> tags) throws BogosException {
         assert command.startsWith("deadline ")
                 : "Deadline parsing is only reached for deadline commands.";
+        String descriptionAndParameters = command.substring(DEADLINE_COMMAND_PREFIX.length());
+        if (descriptionAndParameters.isBlank() || descriptionAndParameters.startsWith("/by")) {
+            throw new BogosException(DEADLINE_BODY_ERROR);
+        }
         if (countParameterOccurrences(command, "/by") > 1) {
-            throw new BogosException("bwhat buplicate /by");
+            throw new BogosException("Bummer, buplicate /by. :[");
         }
 
         int byIndex = command.indexOf(DEADLINE_DATE_MARKER);
         if (byIndex < DEADLINE_COMMAND_PREFIX.length()) {
-            throw new BogosException("bwhat [deadline ... /by ...]");
+            throw new BogosException(DEADLINE_BY_ERROR);
         }
 
         String description = getRequiredDeadlineDescription(
                 command.substring(DEADLINE_COMMAND_PREFIX.length(), byIndex));
-        String by = getRequiredDeadlineDescription(command.substring(byIndex + DEADLINE_DATE_MARKER.length()));
+        String by = command.substring(byIndex + DEADLINE_DATE_MARKER.length()).trim();
+        if (by.isBlank()) {
+            throw new BogosException(DEADLINE_BY_ERROR);
+        }
         return new Deadline(description, parseDate(by), tags);
     }
 
@@ -125,44 +143,43 @@ public class Parser {
     private Task parseEvent(String command, List<String> tags) throws BogosException {
         assert command.startsWith("event ")
                 : "Event parsing is only reached for event commands.";
+        String descriptionAndParameters = command.substring(EVENT_COMMAND_PREFIX.length());
+        if (descriptionAndParameters.isBlank() || descriptionAndParameters.startsWith("/from")
+                || descriptionAndParameters.startsWith("/to")) {
+            throw new BogosException(EVENT_BODY_ERROR);
+        }
         if (countParameterOccurrences(command, "/from") > 1) {
-            throw new BogosException("bwhat buplicate /from");
+            throw new BogosException("Bummer, buplicate /from. :[");
         }
         if (countParameterOccurrences(command, "/to") > 1) {
-            throw new BogosException("bwhat buplicate /to");
+            throw new BogosException("Bummer, buplicate /to. :[");
         }
 
         int fromIndex = command.indexOf(EVENT_START_DATE_MARKER);
+        if (fromIndex < EVENT_COMMAND_PREFIX.length()) {
+            throw new BogosException(EVENT_FROM_ERROR);
+        }
+
         int toIndex = command.indexOf(EVENT_END_DATE_MARKER);
-        if (fromIndex < EVENT_COMMAND_PREFIX.length() || toIndex < fromIndex) {
-            throw new BogosException("bwhat [event ... /from ... /to ...]");
+        if (toIndex < fromIndex) {
+            throw new BogosException(EVENT_TO_ERROR);
         }
 
         String description = getRequiredEventDescription(
                 command.substring(EVENT_COMMAND_PREFIX.length(), fromIndex));
-        String starting = getRequiredEventDescription(
-                command.substring(fromIndex + EVENT_START_DATE_MARKER.length(), toIndex));
-        String ending = getRequiredEventDescription(command.substring(toIndex + EVENT_END_DATE_MARKER.length()));
+        String starting = command.substring(fromIndex + EVENT_START_DATE_MARKER.length(), toIndex).trim();
+        if (starting.isBlank()) {
+            throw new BogosException(EVENT_FROM_ERROR);
+        }
+        String ending = command.substring(toIndex + EVENT_END_DATE_MARKER.length()).trim();
+        if (ending.isBlank()) {
+            throw new BogosException(EVENT_TO_ERROR);
+        }
         try {
             return new Event(description, parseDate(starting), parseDate(ending), tags);
         } catch (IllegalArgumentException e) {
             throw new BogosException("Bro be breathing backwards??");
         }
-    }
-
-    /**
-     * Returns non-blank command text after removing surrounding whitespace.
-     *
-     * @param text Text to validate and trim.
-     * @return Trimmed non-blank text.
-     * @throws BogosException If the text is blank.
-     */
-    private String getRequiredText(String text) throws BogosException {
-        String trimmedText = text.trim();
-        if (trimmedText.isBlank()) {
-            throw new BogosException("bwhat body");
-        }
-        return trimmedText;
     }
 
     /**
@@ -175,7 +192,7 @@ public class Parser {
     private String getRequiredTodoDescription(String descriptionText) throws BogosException {
         String trimmedDescription = descriptionText.trim();
         if (trimmedDescription.isBlank()) {
-            throw new BogosException("bwhat [todo body]");
+            throw new BogosException(TODO_BODY_ERROR);
         }
         return trimmedDescription;
     }
@@ -190,7 +207,7 @@ public class Parser {
     private String getRequiredDeadlineDescription(String descriptionText) throws BogosException {
         String trimmedDescription = descriptionText.trim();
         if (trimmedDescription.isBlank()) {
-            throw new BogosException("bwhat [deadline body]");
+            throw new BogosException(DEADLINE_BODY_ERROR);
         }
         return trimmedDescription;
     }
@@ -205,7 +222,7 @@ public class Parser {
     private String getRequiredEventDescription(String descriptionText) throws BogosException {
         String trimmedDescription = descriptionText.trim();
         if (trimmedDescription.isBlank()) {
-            throw new BogosException("bwhat [event body]");
+            throw new BogosException(EVENT_BODY_ERROR);
         }
         return trimmedDescription;
     }
@@ -221,7 +238,7 @@ public class Parser {
         try {
             return LocalDate.parse(dateText);
         } catch (DateTimeParseException e) {
-            throw new BogosException("bwhat [yyyy-mm-dd]");
+            throw new BogosException("Bogus. Bring Bogos bona-fide YYYY-MM-DD. :[");
         }
     }
 
@@ -267,10 +284,10 @@ public class Parser {
             hasTags = true;
             String tag = token.substring(1);
             if (tag.isEmpty()) {
-                throw new BogosException("bwhat tag");
+                throw new BogosException("Bogus blank #badge. :[");
             }
             if (!uniqueTags.add(tag)) {
-                throw new BogosException("bwhat buplicate tag");
+                throw new BogosException("Bummer, buplicate #badge. :[");
             }
             tags.add(tag);
         }

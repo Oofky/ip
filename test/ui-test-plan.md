@@ -105,7 +105,7 @@ ____________________________________________________________
          2.[D][ ] return book (by: Sep 05 2026)
 ____________________________________________________________
 ____________________________________________________________
-         bwhat buplicate bullet
+         Bummer, buplicate bullet. :[
 ____________________________________________________________
 ____________________________________________________________
          Bye bye! :]
@@ -139,13 +139,13 @@ bye
 ____________________________________________________________
 Blessings! Bogos beckons. Bring Bogos business? :]
 ____________________________________________________________
-         bwhat tag
+         Bogus blank #badge. :[
 ____________________________________________________________
 ____________________________________________________________
-         bwhat buplicate tag
+         Bummer, buplicate #badge. :[
 ____________________________________________________________
 ____________________________________________________________
-         bwhat [todo body]
+         Bwhere body? Be: todo DESCRIPTION [#TAG]...
 ____________________________________________________________
 ____________________________________________________________
          Bye bye! :]
@@ -234,8 +234,8 @@ ____________________________________________________________
 
 ### Aim
 
-Verify that unknown commands and bare commands identify the invalid command or
-the required argument.
+Verify that unknown commands and bare commands provide the help command or the
+required command format.
 
 ### Inputs
 
@@ -263,28 +263,28 @@ bye
 ____________________________________________________________
 Blessings! Bogos beckons. Bring Bogos business? :]
 ____________________________________________________________
-         bwhat
+         Bwhat? Best browse: help
 ____________________________________________________________
 ____________________________________________________________
-         bwhat [todo body]
+         Bwhere body? Be: todo DESCRIPTION [#TAG]...
 ____________________________________________________________
 ____________________________________________________________
-         bwhat [find buzzword]
+         Bwhere buzzword? Be: find KEYWORD
 ____________________________________________________________
 ____________________________________________________________
-         bwhat [mark base-ten]
+         Bwhere base-ten? Be: mark NUMBER
 ____________________________________________________________
 ____________________________________________________________
-         bwhat [unmark base-ten]
+         Bwhere base-ten? Be: unmark NUMBER
 ____________________________________________________________
 ____________________________________________________________
-         bwhat [delete base-ten]
+         Bwhere base-ten? Be: delete NUMBER
 ____________________________________________________________
 ____________________________________________________________
-         bwhat [deadline body]
+         Bwhere body? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...
 ____________________________________________________________
 ____________________________________________________________
-         bwhat [event body]
+         Bwhere body? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...
 ____________________________________________________________
 ____________________________________________________________
          Bye bye! :]
@@ -295,8 +295,8 @@ ____________________________________________________________
 
 ### Aim
 
-Verify that commands with repeated date parameters or same-day event dates are
-rejected without creating tasks.
+Verify that commands with repeated date parameters and reversed event dates are
+rejected, while same-day events are accepted.
 
 ### Inputs
 
@@ -305,6 +305,7 @@ deadline submit report /by 2026-09-15 /by 2026-09-16
 event project meeting /from 2026-09-15 /from 2026-09-16 /to 2026-09-17
 event project meeting /from 2026-09-15 /to 2026-09-16 /to 2026-09-17
 event same day /from 2026-09-17 /to 2026-09-17
+event backwards /from 2026-09-18 /to 2026-09-17
 bye
 ```
 
@@ -320,16 +321,70 @@ bye
 ____________________________________________________________
 Blessings! Bogos beckons. Bring Bogos business? :]
 ____________________________________________________________
-         bwhat buplicate /by
+         Bummer, buplicate /by. :[
 ____________________________________________________________
 ____________________________________________________________
-         bwhat buplicate /from
+         Bummer, buplicate /from. :[
 ____________________________________________________________
 ____________________________________________________________
-         bwhat buplicate /to
+         Bummer, buplicate /to. :[
+____________________________________________________________
+____________________________________________________________
+         Boom! Bullet born: 
+           [E][ ] same day (from: Sep 17 2026 to: Sep 17 2026)
+         3 bullet(s) being.
 ____________________________________________________________
 ____________________________________________________________
          Bro be breathing backwards??
+____________________________________________________________
+____________________________________________________________
+         Bye bye! :]
+____________________________________________________________
+```
+
+## Test case: Explain malformed task details
+
+### Aim
+
+Verify that missing task descriptions take priority and that missing parameters
+and impossible calendar dates receive specific guidance.
+
+### Inputs
+
+```text
+deadline /by 2026-09-15
+deadline submit report
+event project meeting /to 2026-09-16
+event project meeting /from 2026-09-15
+deadline invalid /by 2026-02-30
+bye
+```
+
+### Expected output
+
+```text
+      ___             __ _
+     | _ )    ___    / _` |   ___     ___
+     | _ \   / _ \   \__, |  / _ \   (_-<
+     |___/   \___/   |___/   \___/   /__/_
+   _|"""""|_|"""""|_|"""""|_|"""""|_|"""""|
+   "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'
+____________________________________________________________
+Blessings! Bogos beckons. Bring Bogos business? :]
+____________________________________________________________
+         Bwhere body? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...
+____________________________________________________________
+____________________________________________________________
+         Bwhere /by? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...
+____________________________________________________________
+____________________________________________________________
+         Bwhere /from? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...
+____________________________________________________________
+____________________________________________________________
+         Bwhere /to? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...
+____________________________________________________________
+____________________________________________________________
+         Bogus. Bring Bogos bona-fide YYYY-MM-DD. :[
 ____________________________________________________________
 ____________________________________________________________
          Bye bye! :]

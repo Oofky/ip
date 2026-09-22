@@ -36,7 +36,7 @@ the task.
 ## A few helpful details
 
 - Dates must use the format `YYYY-MM-DD`, for example `2026-09-30`. An event's
-  end date must be later than its start date.
+  end date cannot be earlier than its start date; same-day events are allowed.
 - Add optional tags to any new task with `#`, such as `#school` or `#urgent`.
   Tags must be unique within that task and end at the next space. Text after a
   space is treated as part of the description, so `todo spacetag #two words`

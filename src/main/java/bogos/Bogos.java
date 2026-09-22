@@ -169,7 +169,7 @@ public class Bogos {
             addTask(parser.parseTask(command), responseLines);
             return true;
         } else {
-            throw new BogosException("bwhat");
+            throw new BogosException("Bwhat? Best browse: help");
         }
     }
 
@@ -203,7 +203,8 @@ public class Bogos {
         boolean isMarkCommand = command.equals("mark") || command.startsWith("mark ");
         String taskNumberText = command.substring(isMarkCommand ? "mark".length() : "unmark".length()).trim();
         if (taskNumberText.isEmpty()) {
-            throw new BogosException(isMarkCommand ? "bwhat [mark base-ten]" : "bwhat [unmark base-ten]");
+            throw new BogosException(isMarkCommand ? "Bwhere base-ten? Be: mark NUMBER"
+                    : "Bwhere base-ten? Be: unmark NUMBER");
         }
         Task task = tasks.getTask(parser.parseTaskNumber(taskNumberText));
 
@@ -234,7 +235,7 @@ public class Bogos {
                 : "Only delete commands are routed to the delete handler.";
         String taskNumberText = command.substring("delete".length()).trim();
         if (taskNumberText.isEmpty()) {
-            throw new BogosException("bwhat [delete base-ten]");
+            throw new BogosException("Bwhere base-ten? Be: delete NUMBER");
         }
         Task task = tasks.removeTask(parser.parseTaskNumber(taskNumberText));
         responseLines.add("Brilliant! Bye bye bullet:");
@@ -251,7 +252,7 @@ public class Bogos {
     private void handleFindCommand(String command, List<String> responseLines) throws BogosException {
         String keyword = command.substring("find".length()).trim();
         if (keyword.isEmpty()) {
-            throw new BogosException("bwhat [find buzzword]");
+            throw new BogosException("Bwhere buzzword? Be: find KEYWORD");
         }
 
         List<Task> matchingTasks = tasks.findTasks(keyword);

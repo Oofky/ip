@@ -63,7 +63,7 @@ public class TaskListTest {
                 () -> tasks.addTask(new Deadline("submit report", LocalDate.of(2026, 9, 15),
                         List.of("urgent", "school"))));
 
-        assertEquals("bwhat buplicate bullet", exception.getMessage());
+        assertEquals("Bummer, buplicate bullet. :[", exception.getMessage());
         assertEquals(1, tasks.size());
     }
 }

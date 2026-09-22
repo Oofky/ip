@@ -152,7 +152,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("todooles homework"));
 
-        assertEquals("bwhat", exception.getMessage());
+        assertEquals("Bwhat? Best browse: help", exception.getMessage());
     }
 
     /**
@@ -165,7 +165,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("todo "));
 
-        assertEquals("bwhat [todo body]", exception.getMessage());
+        assertEquals("Bwhere body? Be: todo DESCRIPTION [#TAG]...", exception.getMessage());
     }
 
     /**
@@ -178,7 +178,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("todo"));
 
-        assertEquals("bwhat [todo body]", exception.getMessage());
+        assertEquals("Bwhere body? Be: todo DESCRIPTION [#TAG]...", exception.getMessage());
     }
 
     /**
@@ -191,7 +191,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("deadline"));
 
-        assertEquals("bwhat [deadline body]", exception.getMessage());
+        assertEquals("Bwhere body? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...", exception.getMessage());
     }
 
     /**
@@ -204,7 +204,8 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("event"));
 
-        assertEquals("bwhat [event body]", exception.getMessage());
+        assertEquals("Bwhere body? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...",
+                exception.getMessage());
     }
 
     /**
@@ -217,7 +218,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("todo watch movie #"));
 
-        assertEquals("bwhat tag", exception.getMessage());
+        assertEquals("Bogus blank #badge. :[", exception.getMessage());
     }
 
     /**
@@ -230,7 +231,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("todo watch movie #fun #fun"));
 
-        assertEquals("bwhat buplicate tag", exception.getMessage());
+        assertEquals("Bummer, buplicate #badge. :[", exception.getMessage());
     }
 
     /**
@@ -257,7 +258,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("todo #fun #weekend"));
 
-        assertEquals("bwhat [todo body]", exception.getMessage());
+        assertEquals("Bwhere body? Be: todo DESCRIPTION [#TAG]...", exception.getMessage());
     }
 
     /**
@@ -284,7 +285,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("deadline submit report"));
 
-        assertEquals("bwhat [deadline ... /by ...]", exception.getMessage());
+        assertEquals("Bwhere /by? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...", exception.getMessage());
     }
 
     /**
@@ -297,7 +298,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("deadline submit report /by "));
 
-        assertEquals("bwhat [deadline body]", exception.getMessage());
+        assertEquals("Bwhere /by? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...", exception.getMessage());
     }
 
     /**
@@ -310,7 +311,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("deadline  /by 2026-09-15"));
 
-        assertEquals("bwhat [deadline body]", exception.getMessage());
+        assertEquals("Bwhere body? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...", exception.getMessage());
     }
 
     /**
@@ -321,9 +322,9 @@ public class ParserTest {
         Parser parser = new Parser();
 
         BogosException exception = assertThrows(BogosException.class,
-                () -> parser.parseTask("deadline submit report /by tomorrow"));
+                () -> parser.parseTask("deadline submit report /by 2026-02-30"));
 
-        assertEquals("bwhat [yyyy-mm-dd]", exception.getMessage());
+        assertEquals("Bogus. Bring Bogos bona-fide YYYY-MM-DD. :[", exception.getMessage());
     }
 
     /**
@@ -336,7 +337,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("deadline submit report /by 2026-09-15 /by 2026-09-16"));
 
-        assertEquals("bwhat buplicate /by", exception.getMessage());
+        assertEquals("Bummer, buplicate /by. :[", exception.getMessage());
     }
 
     /**
@@ -349,7 +350,8 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("event project meeting /to 2026-09-16"));
 
-        assertEquals("bwhat [event ... /from ... /to ...]", exception.getMessage());
+        assertEquals("Bwhere /from? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...",
+                exception.getMessage());
     }
 
     /**
@@ -362,7 +364,8 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("event project meeting /from  /to 2026-09-16"));
 
-        assertEquals("bwhat [event body]", exception.getMessage());
+        assertEquals("Bwhere /from? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...",
+                exception.getMessage());
     }
 
     /**
@@ -375,7 +378,8 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("event project meeting /from 2026-09-15"));
 
-        assertEquals("bwhat [event ... /from ... /to ...]", exception.getMessage());
+        assertEquals("Bwhere /to? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...",
+                exception.getMessage());
     }
 
     /**
@@ -388,14 +392,15 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("event project meeting /from 2026-09-15 /to "));
 
-        assertEquals("bwhat [event body]", exception.getMessage());
+        assertEquals("Bwhere /to? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...",
+                exception.getMessage());
     }
 
     /**
      * Verifies that an event cannot end before it starts.
      */
     @Test
-    public void parseTask_eventWithEndDateNotAfterStartDate_exceptionThrown() {
+    public void parseTask_eventWithEndDateBeforeStartDate_exceptionThrown() {
         Parser parser = new Parser();
 
         BogosException exception = assertThrows(BogosException.class,
@@ -408,13 +413,13 @@ public class ParserTest {
      * Verifies that an event cannot end on the same date on which it starts.
      */
     @Test
-    public void parseTask_eventWithSameDates_exceptionThrown() {
+    public void parseTask_eventWithSameDates_success() throws BogosException {
         Parser parser = new Parser();
 
-        BogosException exception = assertThrows(BogosException.class,
-                () -> parser.parseTask("event project meeting /from 2026-09-15 /to 2026-09-15"));
+        Event event = assertInstanceOf(Event.class,
+                parser.parseTask("event project meeting /from 2026-09-15 /to 2026-09-15"));
 
-        assertEquals("Bro be breathing backwards??", exception.getMessage());
+        assertEquals(event.getStartDate(), event.getEndDate());
     }
 
     /**
@@ -427,7 +432,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("event project meeting /from tomorrow /to 2026-09-16"));
 
-        assertEquals("bwhat [yyyy-mm-dd]", exception.getMessage());
+        assertEquals("Bogus. Bring Bogos bona-fide YYYY-MM-DD. :[", exception.getMessage());
     }
 
     /**
@@ -441,7 +446,7 @@ public class ParserTest {
                 () -> parser.parseTask("event project meeting /from 2026-09-15"
                         + " /from 2026-09-16 /to 2026-09-17"));
 
-        assertEquals("bwhat buplicate /from", exception.getMessage());
+        assertEquals("Bummer, buplicate /from. :[", exception.getMessage());
     }
 
     /**
@@ -455,7 +460,7 @@ public class ParserTest {
                 () -> parser.parseTask("event project meeting /from 2026-09-15"
                         + " /to 2026-09-16 /to 2026-09-17"));
 
-        assertEquals("bwhat buplicate /to", exception.getMessage());
+        assertEquals("Bummer, buplicate /to. :[", exception.getMessage());
     }
 
     /**
