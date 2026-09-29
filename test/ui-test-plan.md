@@ -390,3 +390,50 @@ ____________________________________________________________
          Bye bye! :]
 ____________________________________________________________
 ```
+
+## Test case: Explain misplaced and reordered date parameters
+
+### Aim
+
+Verify that event date markers can be reordered, reversed dates are still
+reported accurately, and task-type-specific date markers receive clear errors.
+
+### Inputs
+
+```text
+event reordered markers /to 2026-11-02 /from 2026-11-01
+event backwards markers /to 2026-11-01 /from 2026-11-02
+deadline submit report /by 2026-11-01 /from 2026-11-02
+event submit report /from 2026-11-01 /by 2026-11-02 /to 2026-11-03
+bye
+```
+
+### Expected output
+
+```text
+      ___             __ _
+     | _ )    ___    / _` |   ___     ___
+     | _ \   / _ \   \__, |  / _ \   (_-<
+     |___/   \___/   |___/   \___/   /__/_
+   _|"""""|_|"""""|_|"""""|_|"""""|_|"""""|
+   "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'
+____________________________________________________________
+Blessings! Bogos beckons. Bring Bogos business? :]
+____________________________________________________________
+         Boom! Bullet born: 
+           [E][ ] reordered markers (from: Nov 01 2026 to: Nov 02 2026)
+         4 bullet(s) being.
+____________________________________________________________
+____________________________________________________________
+         Bro be breathing backwards??
+____________________________________________________________
+____________________________________________________________
+         Bwhere /by? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...
+____________________________________________________________
+____________________________________________________________
+         Bummer, /by be deadline-only. :[
+____________________________________________________________
+____________________________________________________________
+         Bye bye! :]
+____________________________________________________________
+```

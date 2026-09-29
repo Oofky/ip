@@ -143,6 +143,22 @@ public class ParserTest {
     }
 
     /**
+     * Verifies that event date markers may appear in either order.
+     *
+     * @throws BogosException If the valid command cannot be parsed.
+     */
+    @Test
+    public void parseTask_eventWithReorderedDateMarkers_success() throws BogosException {
+        Parser parser = new Parser();
+
+        Event event = assertInstanceOf(Event.class,
+                parser.parseTask("event submit report /to 2026-11-02 /from 2026-11-01"));
+
+        assertEquals(LocalDate.of(2026, 11, 1), event.getStartDate());
+        assertEquals(LocalDate.of(2026, 11, 2), event.getEndDate());
+    }
+
+    /**
      * Verifies that an unrecognised command produces a parser error.
      */
     @Test
@@ -410,6 +426,19 @@ public class ParserTest {
     }
 
     /**
+     * Verifies that reversed event dates are reported even when their markers are reordered.
+     */
+    @Test
+    public void parseTask_eventWithReorderedMarkersAndReversedDates_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("event submit report /to 2026-11-01 /from 2026-11-02"));
+
+        assertEquals("Bro be breathing backwards??", exception.getMessage());
+    }
+
+    /**
      * Verifies that an event cannot end on the same date on which it starts.
      */
     @Test
@@ -433,6 +462,37 @@ public class ParserTest {
                 () -> parser.parseTask("event project meeting /from tomorrow /to 2026-09-16"));
 
         assertEquals("Bogus. Bring Bogos bona-fide YYYY-MM-DD. :[", exception.getMessage());
+    }
+
+    /**
+     * Verifies that all unsupported deadline markers receive the standard deadline usage error.
+     */
+    @Test
+    public void parseTask_deadlineWithUnsupportedParameter_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException fromException = assertThrows(BogosException.class,
+                () -> parser.parseTask("deadline submit report /by 2026-11-01 /from 2026-11-02"));
+        BogosException unknownException = assertThrows(BogosException.class,
+                () -> parser.parseTask("deadline submit report /hello 2026-11-02"));
+
+        assertEquals("Bwhere /by? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...",
+                fromException.getMessage());
+        assertEquals("Bwhere /by? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...",
+                unknownException.getMessage());
+    }
+
+    /**
+     * Verifies that a deadline-only marker in an event command receives a specific error.
+     */
+    @Test
+    public void parseTask_eventWithDeadlineParameter_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("event submit report /from 2026-11-01 /by 2026-11-02 /to 2026-11-03"));
+
+        assertEquals("Bummer, /by be deadline-only. :[", exception.getMessage());
     }
 
     /**

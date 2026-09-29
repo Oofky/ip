@@ -14,9 +14,6 @@ public class Parser {
     private static final String TODO_COMMAND_PREFIX = "todo ";
     private static final String DEADLINE_COMMAND_PREFIX = "deadline ";
     private static final String EVENT_COMMAND_PREFIX = "event ";
-    private static final String DEADLINE_DATE_MARKER = " /by ";
-    private static final String EVENT_START_DATE_MARKER = " /from ";
-    private static final String EVENT_END_DATE_MARKER = " /to ";
     private static final String TODO_BODY_ERROR = "Bwhere body? Be: todo DESCRIPTION [#TAG]...";
     private static final String DEADLINE_BODY_ERROR =
             "Bwhere body? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...";
@@ -28,6 +25,8 @@ public class Parser {
             "Bwhere /from? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...";
     private static final String EVENT_TO_ERROR =
             "Bwhere /to? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...";
+    private static final String EVENT_DEADLINE_PARAMETER_ERROR =
+            "Bummer, /by be deadline-only. :[";
 
     /**
      * Returns whether a command creates a task.
@@ -110,26 +109,12 @@ public class Parser {
     private Task parseDeadline(String command, List<String> tags) throws BogosException {
         assert command.startsWith("deadline ")
                 : "Deadline parsing is only reached for deadline commands.";
-        String descriptionAndParameters = command.substring(DEADLINE_COMMAND_PREFIX.length());
-        if (descriptionAndParameters.isBlank() || descriptionAndParameters.startsWith("/by")) {
-            throw new BogosException(DEADLINE_BODY_ERROR);
-        }
-        if (countParameterOccurrences(command, "/by") > 1) {
-            throw new BogosException("Bummer, buplicate /by. :[");
-        }
-
-        int byIndex = command.indexOf(DEADLINE_DATE_MARKER);
-        if (byIndex < DEADLINE_COMMAND_PREFIX.length()) {
+        DateParameters parameters = extractDateParameters(command, DEADLINE_COMMAND_PREFIX, true);
+        if (parameters.byDate() == null) {
             throw new BogosException(DEADLINE_BY_ERROR);
         }
 
-        String description = getRequiredDeadlineDescription(
-                command.substring(DEADLINE_COMMAND_PREFIX.length(), byIndex));
-        String by = command.substring(byIndex + DEADLINE_DATE_MARKER.length()).trim();
-        if (by.isBlank()) {
-            throw new BogosException(DEADLINE_BY_ERROR);
-        }
-        return new Deadline(description, parseDate(by), tags);
+        return new Deadline(parameters.description(), parseDate(parameters.byDate()), tags);
     }
 
     /**
@@ -143,43 +128,118 @@ public class Parser {
     private Task parseEvent(String command, List<String> tags) throws BogosException {
         assert command.startsWith("event ")
                 : "Event parsing is only reached for event commands.";
-        String descriptionAndParameters = command.substring(EVENT_COMMAND_PREFIX.length());
-        if (descriptionAndParameters.isBlank() || descriptionAndParameters.startsWith("/from")
-                || descriptionAndParameters.startsWith("/to")) {
-            throw new BogosException(EVENT_BODY_ERROR);
-        }
-        if (countParameterOccurrences(command, "/from") > 1) {
-            throw new BogosException("Bummer, buplicate /from. :[");
-        }
-        if (countParameterOccurrences(command, "/to") > 1) {
-            throw new BogosException("Bummer, buplicate /to. :[");
-        }
-
-        int fromIndex = command.indexOf(EVENT_START_DATE_MARKER);
-        if (fromIndex < EVENT_COMMAND_PREFIX.length()) {
+        DateParameters parameters = extractDateParameters(command, EVENT_COMMAND_PREFIX, false);
+        if (parameters.fromDate() == null) {
             throw new BogosException(EVENT_FROM_ERROR);
         }
-
-        int toIndex = command.indexOf(EVENT_END_DATE_MARKER);
-        if (toIndex < fromIndex) {
+        if (parameters.toDate() == null) {
             throw new BogosException(EVENT_TO_ERROR);
         }
 
-        String description = getRequiredEventDescription(
-                command.substring(EVENT_COMMAND_PREFIX.length(), fromIndex));
-        String starting = command.substring(fromIndex + EVENT_START_DATE_MARKER.length(), toIndex).trim();
-        if (starting.isBlank()) {
-            throw new BogosException(EVENT_FROM_ERROR);
-        }
-        String ending = command.substring(toIndex + EVENT_END_DATE_MARKER.length()).trim();
-        if (ending.isBlank()) {
-            throw new BogosException(EVENT_TO_ERROR);
-        }
         try {
-            return new Event(description, parseDate(starting), parseDate(ending), tags);
+            return new Event(parameters.description(), parseDate(parameters.fromDate()),
+                    parseDate(parameters.toDate()), tags);
         } catch (IllegalArgumentException e) {
             throw new BogosException("Bro be breathing backwards??");
         }
+    }
+
+    /**
+     * Separates a task description from its date parameters and validates their marker names.
+     *
+     * @param command Task command containing a description and optional date parameters.
+     * @param commandPrefix Prefix identifying the task type.
+     * @param isDeadline Whether the command is a deadline rather than an event.
+     * @return Description and date values indexed by their markers.
+     * @throws BogosException If the description or parameter syntax is invalid.
+     */
+    private DateParameters extractDateParameters(String command, String commandPrefix, boolean isDeadline)
+            throws BogosException {
+        String[] tokens = command.substring(commandPrefix.length()).trim().split("\\s+");
+        List<String> descriptionTokens = new ArrayList<>();
+        boolean hasDateParameter = false;
+        String byDate = null;
+        String fromDate = null;
+        String toDate = null;
+
+        for (int index = 0; index < tokens.length; index++) {
+            String token = tokens[index];
+            if (!token.startsWith("/")) {
+                if (hasDateParameter) {
+                    throw new BogosException("Bogus. Bring Bogos bona-fide YYYY-MM-DD. :[");
+                }
+                descriptionTokens.add(token);
+                continue;
+            }
+
+            hasDateParameter = true;
+            if (isDeadline && !token.equals("/by")) {
+                throw new BogosException(getDateParameterUsageError(true));
+            }
+            if (!isDeadline && token.equals("/by")) {
+                throw new BogosException(EVENT_DEADLINE_PARAMETER_ERROR);
+            }
+            if (!token.equals("/by") && !token.equals("/from") && !token.equals("/to")) {
+                throw new BogosException(getDateParameterUsageError(isDeadline));
+            }
+            if (index + 1 == tokens.length || tokens[index + 1].startsWith("/")) {
+                throw new BogosException(getMissingDateParameterError(token));
+            }
+
+            String date = tokens[++index];
+            switch (token) {
+            case "/by" -> {
+                if (byDate != null) {
+                    throw new BogosException("Bummer, buplicate /by. :[");
+                }
+                byDate = date;
+            }
+            case "/from" -> {
+                if (fromDate != null) {
+                    throw new BogosException("Bummer, buplicate /from. :[");
+                }
+                fromDate = date;
+            }
+            case "/to" -> {
+                if (toDate != null) {
+                    throw new BogosException("Bummer, buplicate /to. :[");
+                }
+                toDate = date;
+            }
+            default -> throw new IllegalStateException("Validated date parameter was not handled.");
+            }
+        }
+
+        String description = String.join(" ", descriptionTokens);
+        if (description.isBlank()) {
+            throw new BogosException(isDeadline ? DEADLINE_BODY_ERROR : EVENT_BODY_ERROR);
+        }
+        return new DateParameters(description, byDate, fromDate, toDate);
+    }
+
+    /**
+     * Returns a command-specific usage error for an unrecognised date marker.
+     *
+     * @param isDeadline Whether the command is a deadline rather than an event.
+     * @return Usage error for the task command.
+     */
+    private String getDateParameterUsageError(boolean isDeadline) {
+        return isDeadline ? DEADLINE_BY_ERROR : EVENT_FROM_ERROR;
+    }
+
+    /**
+     * Returns the appropriate error for a date marker without a following date.
+     *
+     * @param parameter Date marker missing its value.
+     * @return Error describing the missing marker value.
+     */
+    private String getMissingDateParameterError(String parameter) {
+        return switch (parameter) {
+        case "/by" -> DEADLINE_BY_ERROR;
+        case "/from" -> EVENT_FROM_ERROR;
+        case "/to" -> EVENT_TO_ERROR;
+        default -> throw new IllegalArgumentException("Unknown date parameter: " + parameter);
+        };
     }
 
     /**
@@ -243,25 +303,6 @@ public class Parser {
     }
 
     /**
-     * Counts occurrences of a parameter token in a command.
-     *
-     * @param command Command containing zero or more parameter tokens.
-     * @param parameter Parameter token to count.
-     * @return Number of occurrences of the parameter token.
-     */
-    private int countParameterOccurrences(String command, String parameter) {
-        int occurrenceCount = 0;
-        String[] tokens = command.split("\\s+");
-
-        for (String token : tokens) {
-            if (token.equals(parameter)) {
-                occurrenceCount++;
-            }
-        }
-        return occurrenceCount;
-    }
-
-    /**
      * Separates inline tag tokens from a task command.
      *
      * @param command Raw task command.
@@ -302,5 +343,16 @@ public class Parser {
      * @param tags Tags extracted from the command.
      */
     private record ParsedTaskInput(String commandWithoutTags, List<String> tags) {
+    }
+
+    /**
+     * Holds a task description and date values extracted from its parameter markers.
+     *
+     * @param description Task description before the first date marker.
+     * @param byDate Due date supplied by {@code /by}, if present.
+     * @param fromDate Start date supplied by {@code /from}, if present.
+     * @param toDate End date supplied by {@code /to}, if present.
+     */
+    private record DateParameters(String description, String byDate, String fromDate, String toDate) {
     }
 }

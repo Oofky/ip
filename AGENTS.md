@@ -39,8 +39,7 @@ before creating or modifying Java code.
 After every code update, review `test/ui-test-plan.md` and update it whenever
 the change adds, removes, or changes observable console UI behavior. Then
 invoke the project-specific `test-ui` skill to run the planned console UI
-sessions. Include the complete console input/output record from that skill in
-the final report. If a test fails, stop the test session immediately and report
+sessions. If a test fails, stop the test session immediately and report
 the actual and expected output before making further code changes.
 
 ## Git
