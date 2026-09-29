@@ -165,7 +165,7 @@ public class Parser {
             String token = tokens[index];
             if (!token.startsWith("/")) {
                 if (hasDateParameter) {
-                    throw new BogosException("Bogus. Bring Bogos bona-fide YYYY-MM-DD. :[");
+                    throw new BogosException(FOREIGN_OBJECT_ERROR_PREFIX + token);
                 }
                 descriptionTokens.add(token);
                 continue;

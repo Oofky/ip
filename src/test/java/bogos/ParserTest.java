@@ -357,6 +357,19 @@ public class ParserTest {
     }
 
     /**
+     * Verifies that ordinary text cannot follow a deadline's due date.
+     */
+    @Test
+    public void parseTask_deadlineWithTextAfterDate_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("deadline bridge /by 2026-02-02 bridge"));
+
+        assertEquals("Bah! Unidentified Foreign Object: bridge", exception.getMessage());
+    }
+
+    /**
      * Verifies that a deadline command cannot specify its due-date parameter twice.
      */
     @Test
@@ -475,6 +488,19 @@ public class ParserTest {
                 () -> parser.parseTask("event project meeting /from tomorrow /to 2026-09-16"));
 
         assertEquals("Bogus. Bring Bogos bona-fide YYYY-MM-DD. :[", exception.getMessage());
+    }
+
+    /**
+     * Verifies that ordinary text cannot follow an event date.
+     */
+    @Test
+    public void parseTask_eventWithTextAfterDate_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("event meeting /from 2026-02-02 stray /to 2026-02-03"));
+
+        assertEquals("Bah! Unidentified Foreign Object: stray", exception.getMessage());
     }
 
     /**

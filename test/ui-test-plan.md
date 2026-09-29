@@ -351,8 +351,8 @@ ____________________________________________________________
 
 ### Aim
 
-Verify that missing task descriptions take priority and that missing parameters
-and impossible calendar dates receive specific guidance.
+Verify that missing task descriptions take priority and that missing parameters,
+impossible calendar dates, and trailing text receive specific guidance.
 
 ### Inputs
 
@@ -362,6 +362,7 @@ deadline submit report
 event project meeting /to 2026-09-16
 event project meeting /from 2026-09-15
 deadline invalid /by 2026-02-30
+deadline bridge /by 2026-02-02 bridge
 bye
 ```
 
@@ -390,6 +391,9 @@ ____________________________________________________________
 ____________________________________________________________
 ____________________________________________________________
          Bogus. Bring Bogos bona-fide YYYY-MM-DD. :[
+____________________________________________________________
+____________________________________________________________
+         Bah! Unidentified Foreign Object: bridge
 ____________________________________________________________
 ____________________________________________________________
          Bye bye! :]
