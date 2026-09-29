@@ -113,7 +113,7 @@ public class Parser {
             throw new BogosException(DEADLINE_BY_ERROR);
         }
 
-        return new Deadline(parameters.description(), parseDate(parameters.byDate()), tags);
+        return new Deadline(parameters.description(), parameters.byDate(), tags);
     }
 
     /**
@@ -136,8 +136,7 @@ public class Parser {
         }
 
         try {
-            return new Event(parameters.description(), parseDate(parameters.fromDate()),
-                    parseDate(parameters.toDate()), tags);
+            return new Event(parameters.description(), parameters.fromDate(), parameters.toDate(), tags);
         } catch (IllegalArgumentException e) {
             throw new BogosException("Bro be breathing backwards??");
         }
@@ -157,9 +156,9 @@ public class Parser {
         String[] tokens = command.substring(commandPrefix.length()).trim().split("\\s+");
         List<String> descriptionTokens = new ArrayList<>();
         boolean hasDateParameter = false;
-        String byDate = null;
-        String fromDate = null;
-        String toDate = null;
+        LocalDate byDate = null;
+        LocalDate fromDate = null;
+        LocalDate toDate = null;
 
         for (int index = 0; index < tokens.length; index++) {
             String token = tokens[index];
@@ -182,8 +181,7 @@ public class Parser {
                 throw new BogosException(getMissingDateParameterError(token));
             }
 
-            String date = tokens[++index];
-            parseDate(date);
+            LocalDate date = parseDate(tokens[++index]);
             switch (token) {
             case "/by" -> {
                 if (byDate != null) {
@@ -346,13 +344,13 @@ public class Parser {
     }
 
     /**
-     * Holds a task description and date values extracted from its parameter markers.
+     * Holds a task description and parsed date values extracted from its parameter markers.
      *
      * @param description Task description before the first date marker.
-     * @param byDate Due date supplied by {@code /by}, if present.
-     * @param fromDate Start date supplied by {@code /from}, if present.
-     * @param toDate End date supplied by {@code /to}, if present.
+     * @param byDate Parsed due date supplied by {@code /by}, if present.
+     * @param fromDate Parsed start date supplied by {@code /from}, if present.
+     * @param toDate Parsed end date supplied by {@code /to}, if present.
      */
-    private record DateParameters(String description, String byDate, String fromDate, String toDate) {
+    private record DateParameters(String description, LocalDate byDate, LocalDate fromDate, LocalDate toDate) {
     }
 }
