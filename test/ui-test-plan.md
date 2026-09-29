@@ -116,7 +116,8 @@ ____________________________________________________________
 
 ### Aim
 
-Verify that blank, duplicate, and description-only tag commands are rejected without creating tasks.
+Verify that blank, duplicate, description-only, and non-final tag commands are
+rejected without creating tasks.
 
 ### Inputs
 
@@ -124,6 +125,7 @@ Verify that blank, duplicate, and description-only tag commands are rejected wit
 todo watch movie #
 todo watch movie #fun #fun
 todo #fun #weekend
+todo spacetag #two words
 bye
 ```
 
@@ -146,6 +148,9 @@ ____________________________________________________________
 ____________________________________________________________
 ____________________________________________________________
          Bwhere body? Be: todo DESCRIPTION [#TAG]...
+____________________________________________________________
+____________________________________________________________
+         Bah! Unidentified Foreign Object: words
 ____________________________________________________________
 ____________________________________________________________
          Bye bye! :]
@@ -431,7 +436,7 @@ ____________________________________________________________
          Bwhere /by? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...
 ____________________________________________________________
 ____________________________________________________________
-         Bummer, /by be deadline-only. :[
+         Bwhere /from? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...
 ____________________________________________________________
 ____________________________________________________________
          Bye bye! :]

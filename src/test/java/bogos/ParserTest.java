@@ -90,16 +90,16 @@ public class ParserTest {
     }
 
     /**
-     * Verifies that tags may appear before a deadline's date marker.
+     * Verifies that tags can be appended after a deadline's date marker.
      *
      * @throws BogosException If the valid command cannot be parsed.
      */
     @Test
-    public void parseTask_deadlineWithTagsBeforeDateMarker_success() throws BogosException {
+    public void parseTask_deadlineWithTrailingTags_success() throws BogosException {
         Parser parser = new Parser();
 
         Deadline deadline = assertInstanceOf(Deadline.class,
-                parser.parseTask("deadline submit report #school /by 2026-09-15"));
+                parser.parseTask("deadline submit report /by 2026-09-15 #school"));
 
         assertEquals("submit report", deadline.getDescription());
         assertEquals(List.of("school"), deadline.getTags());
@@ -125,16 +125,16 @@ public class ParserTest {
     }
 
     /**
-     * Verifies that tags may appear between an event's date markers and after its end date.
+     * Verifies that tags can be appended after an event's date markers.
      *
      * @throws BogosException If the valid command cannot be parsed.
      */
     @Test
-    public void parseTask_eventWithTagsAroundDates_success() throws BogosException {
+    public void parseTask_eventWithTrailingTags_success() throws BogosException {
         Parser parser = new Parser();
 
         Event event = assertInstanceOf(Event.class,
-                parser.parseTask("event project meeting /from #team 2026-09-15 /to 2026-09-16 #Fun"));
+                parser.parseTask("event project meeting /from 2026-09-15 /to 2026-09-16 #team #Fun"));
 
         assertEquals("project meeting", event.getDescription());
         assertEquals(List.of("team", "Fun"), event.getTags());
@@ -248,6 +248,19 @@ public class ParserTest {
                 () -> parser.parseTask("todo watch movie #fun #fun"));
 
         assertEquals("Bummer, buplicate #badge. :[", exception.getMessage());
+    }
+
+    /**
+     * Verifies that ordinary text cannot follow a tag suffix.
+     */
+    @Test
+    public void parseTask_todoWithTextAfterTag_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("todo spacetag #two words"));
+
+        assertEquals("Bah! Unidentified Foreign Object: words", exception.getMessage());
     }
 
     /**
@@ -483,16 +496,17 @@ public class ParserTest {
     }
 
     /**
-     * Verifies that a deadline-only marker in an event command receives a specific error.
+     * Verifies that unsupported event markers receive the standard event usage error.
      */
     @Test
-    public void parseTask_eventWithDeadlineParameter_exceptionThrown() {
+    public void parseTask_eventWithUnsupportedParameter_exceptionThrown() {
         Parser parser = new Parser();
 
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("event submit report /from 2026-11-01 /by 2026-11-02 /to 2026-11-03"));
 
-        assertEquals("Bummer, /by be deadline-only. :[", exception.getMessage());
+        assertEquals("Bwhere /from? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...",
+                exception.getMessage());
     }
 
     /**

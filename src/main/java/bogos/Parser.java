@@ -25,8 +25,7 @@ public class Parser {
             "Bwhere /from? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...";
     private static final String EVENT_TO_ERROR =
             "Bwhere /to? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...";
-    private static final String EVENT_DEADLINE_PARAMETER_ERROR =
-            "Bummer, /by be deadline-only. :[";
+    private static final String FOREIGN_OBJECT_ERROR_PREFIX = "Bah! Unidentified Foreign Object: ";
 
     /**
      * Returns whether a command creates a task.
@@ -176,10 +175,7 @@ public class Parser {
             if (isDeadline && !token.equals("/by")) {
                 throw new BogosException(getDateParameterUsageError(true));
             }
-            if (!isDeadline && token.equals("/by")) {
-                throw new BogosException(EVENT_DEADLINE_PARAMETER_ERROR);
-            }
-            if (!token.equals("/by") && !token.equals("/from") && !token.equals("/to")) {
+            if (!isDeadline && !token.equals("/from") && !token.equals("/to")) {
                 throw new BogosException(getDateParameterUsageError(isDeadline));
             }
             if (index + 1 == tokens.length || tokens[index + 1].startsWith("/")) {
@@ -307,7 +303,7 @@ public class Parser {
      *
      * @param command Raw task command.
      * @return Task command without tags and tags in their original order.
-     * @throws BogosException If a tag is blank or duplicated.
+     * @throws BogosException If a tag is blank, duplicated, or followed by non-tag text.
      */
     private ParsedTaskInput extractTags(String command) throws BogosException {
         String[] tokens = command.split("\\s+");
@@ -318,6 +314,9 @@ public class Parser {
 
         for (String token : tokens) {
             if (!token.startsWith("#")) {
+                if (hasTags) {
+                    throw new BogosException(FOREIGN_OBJECT_ERROR_PREFIX + token);
+                }
                 commandTokens.add(token);
                 continue;
             }
