@@ -256,6 +256,11 @@ public class Bogos {
         }
 
         List<Task> matchingTasks = tasks.findTasks(keyword);
+        if (matchingTasks.isEmpty()) {
+            responseLines.add("Bogos' beams bounced back blank. :[");
+            return;
+        }
+
         responseLines.add("Bogos brings befitting bullets:");
         for (int i = 0; i < matchingTasks.size(); i++) {
             responseLines.add((i + 1) + "." + matchingTasks.get(i));
