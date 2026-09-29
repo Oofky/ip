@@ -183,6 +183,7 @@ public class Parser {
             }
 
             String date = tokens[++index];
+            parseDate(date);
             switch (token) {
             case "/by" -> {
                 if (byDate != null) {

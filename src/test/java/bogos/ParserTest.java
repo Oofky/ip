@@ -489,6 +489,19 @@ public class ParserTest {
     }
 
     /**
+     * Verifies that a missing separator between an event date and marker is reported as an invalid date.
+     */
+    @Test
+    public void parseTask_eventWithDateAndMarkerWithoutSeparator_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("event hike /from 2026-05-12/to 2026-04-10"));
+
+        assertEquals("Bogus. Bring Bogos bona-fide YYYY-MM-DD. :[", exception.getMessage());
+    }
+
+    /**
      * Verifies that ordinary text cannot follow an event date.
      */
     @Test
