@@ -24,7 +24,7 @@ public class Bogos {
             "  help",
             "  bye",
             "",
-            "Browse beyond the basics: https://oofky.github.io/ip/");
+            "Browse beyond basics: https://oofky.github.io/ip/");
 
     private final Ui userInterface;
     private final Parser parser;

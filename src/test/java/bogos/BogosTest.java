@@ -32,7 +32,7 @@ public class BogosTest {
                 "  help",
                 "  bye",
                 "",
-                "Browse beyond the basics: https://oofky.github.io/ip/");
+                "Browse beyond basics: https://oofky.github.io/ip/");
         assertEquals(expectedResponse, response);
     }
 
