@@ -358,6 +358,8 @@ parameters, impossible calendar dates, and trailing text receive specific guidan
 
 ```text
 deadline /by 2026-09-15
+deadline /by nonsense
+event /from 2026-05-12 /to 2026-05-13
 deadline submit report
 event project meeting /to 2026-09-16
 event project meeting /from 2026-09-15
@@ -383,6 +385,12 @@ ____________________________________________________________
 Blessings! Bogos beckons. Bring Bogos business? :]
 ____________________________________________________________
          Bwhere body? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...
+____________________________________________________________
+____________________________________________________________
+         Bwhere body? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...
+____________________________________________________________
+____________________________________________________________
+         Bwhere body? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...
 ____________________________________________________________
 ____________________________________________________________
          Bwhere /by? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...

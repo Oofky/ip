@@ -344,6 +344,19 @@ public class ParserTest {
     }
 
     /**
+     * Verifies that a missing deadline description takes priority over an invalid due date.
+     */
+    @Test
+    public void parseTask_deadlineWithEmptyDescAndInvalidDate_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("deadline /by nonsense"));
+
+        assertEquals("Bwhere body? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...", exception.getMessage());
+    }
+
+    /**
      * Verifies that a deadline date must use the ISO-8601 format.
      */
     @Test
@@ -407,6 +420,20 @@ public class ParserTest {
                 () -> parser.parseTask("event project meeting /from  /to 2026-09-16"));
 
         assertEquals("Bogus blank /from. :[", exception.getMessage());
+    }
+
+    /**
+     * Verifies that a missing event description takes priority over date parameters.
+     */
+    @Test
+    public void parseTask_eventWithEmptyDescAndDateParameters_exceptionThrown() {
+        Parser parser = new Parser();
+
+        BogosException exception = assertThrows(BogosException.class,
+                () -> parser.parseTask("event /from 2026-05-12 /to 2026-05-13"));
+
+        assertEquals("Bwhere body? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...",
+                exception.getMessage());
     }
 
     /**

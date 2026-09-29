@@ -170,6 +170,9 @@ public class Parser {
                 continue;
             }
 
+            if (descriptionTokens.isEmpty()) {
+                throw new BogosException(isDeadline ? DEADLINE_BODY_ERROR : EVENT_BODY_ERROR);
+            }
             hasDateParameter = true;
             if (isDeadline && !token.equals("/by")) {
                 throw new BogosException(getDateParameterUsageError(true));
