@@ -31,6 +31,7 @@ the task.
 | Complete a task | `mark NUMBER` | `mark 2` |
 | Reopen a completed task | `unmark NUMBER` | `unmark 2` |
 | Remove a task | `delete NUMBER` | `delete 2` |
+| View command help | `help` | `help` |
 | Close Bogos | `bye` | `bye` |
 
 ## A few helpful details
@@ -45,6 +46,8 @@ the task.
   the matching tasks in their original order.
 - Task numbers start at 1 and can change after you delete a task—run `list` if
   you are unsure which number to use.
+- Type `help` to display the complete list of available commands and a link to
+  this guide. `help` does not take any arguments.
 - Keep command punctuation as shown: `/by`, `/from`, and `/to` appear once
   each in their respective commands. The `|` character is not supported.
 - Bogos does not add duplicate tasks with the same details.
