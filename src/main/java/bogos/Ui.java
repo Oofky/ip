@@ -73,6 +73,6 @@ Blessings! Bogos beckons. Bring Bogos business? :]""";
      * @param message Message to display.
      */
     public void showMessage(String message) {
-        System.out.println(INDENT + message);
+        System.out.println(message.isEmpty() ? "" : INDENT + message);
     }
 }

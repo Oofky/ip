@@ -16,6 +16,52 @@ Before running the full plan, delete `data/bogos.txt` so the first session start
 with no saved tasks. The test cases run in the listed order because later sessions
 verify tasks saved by earlier sessions.
 
+## Test case: Show command help
+
+### Aim
+
+Verify that `help` displays every supported command and the documentation link.
+
+### Inputs
+
+```text
+help
+bye
+```
+
+### Expected output
+
+```text
+      ___             __ _
+     | _ )    ___    / _` |   ___     ___
+     | _ \   / _ \   \__, |  / _ \   (_-<
+     |___/   \___/   |___/   \___/   /__/_
+   _|"""""|_|"""""|_|"""""|_|"""""|_|"""""|
+   "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'
+____________________________________________________________
+Blessings! Bogos beckons. Bring Bogos business? :]
+____________________________________________________________
+         Bogos' basic business:
+
+           todo DESCRIPTION [#TAG]...
+           deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...
+           event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...
+
+           list
+           find KEYWORD
+           mark NUMBER
+           unmark NUMBER
+           delete NUMBER
+           help
+           bye
+
+         Browse beyond the basics: https://oofky.github.io/ip/
+____________________________________________________________
+____________________________________________________________
+         Bye bye! :]
+____________________________________________________________
+```
+
 ## Test case: List an empty task list
 
 ### Aim

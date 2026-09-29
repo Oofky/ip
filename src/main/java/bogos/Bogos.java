@@ -9,6 +9,22 @@ import java.util.List;
  */
 public class Bogos {
     private static final String WELCOME_MESSAGE = "Blessings! Bogos beckons. Bring Bogos business? :]";
+    private static final List<String> HELP_MESSAGE = List.of(
+            "Bogos' basic business:",
+            "",
+            "  todo DESCRIPTION [#TAG]...",
+            "  deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...",
+            "  event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...",
+            "",
+            "  list",
+            "  find KEYWORD",
+            "  mark NUMBER",
+            "  unmark NUMBER",
+            "  delete NUMBER",
+            "  help",
+            "  bye",
+            "",
+            "Browse beyond the basics: https://oofky.github.io/ip/");
 
     private final Ui userInterface;
     private final Parser parser;
@@ -154,6 +170,9 @@ public class Bogos {
             throw new BogosException("Bah! Bpipes ('|') banned!");
         } else if (command.equals("list")) {
             handleListCommand(responseLines);
+            return false;
+        } else if (command.equals("help")) {
+            responseLines.addAll(HELP_MESSAGE);
             return false;
         } else if (command.equals("find") || command.startsWith("find ")) {
             handleFindCommand(command, responseLines);
