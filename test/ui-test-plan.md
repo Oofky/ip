@@ -351,8 +351,8 @@ ____________________________________________________________
 
 ### Aim
 
-Verify that missing task descriptions take priority and that missing parameters,
-impossible calendar dates, and trailing text receive specific guidance.
+Verify that missing task descriptions take priority and that missing and blank
+parameters, impossible calendar dates, and trailing text receive specific guidance.
 
 ### Inputs
 
@@ -361,6 +361,9 @@ deadline /by 2026-09-15
 deadline submit report
 event project meeting /to 2026-09-16
 event project meeting /from 2026-09-15
+deadline submit report /by
+event project meeting /from /to 2026-09-16
+event project meeting /from 2026-09-15 /to
 deadline invalid /by 2026-02-30
 deadline bridge /by 2026-02-02 bridge
 bye
@@ -388,6 +391,15 @@ ____________________________________________________________
 ____________________________________________________________
 ____________________________________________________________
          Bwhere /to? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...
+____________________________________________________________
+____________________________________________________________
+         Bogus blank /by. :[
+____________________________________________________________
+____________________________________________________________
+         Bogus blank /from. :[
+____________________________________________________________
+____________________________________________________________
+         Bogus blank /to. :[
 ____________________________________________________________
 ____________________________________________________________
          Bogus. Bring Bogos bona-fide YYYY-MM-DD. :[

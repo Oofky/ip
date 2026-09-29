@@ -327,7 +327,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("deadline submit report /by "));
 
-        assertEquals("Bwhere /by? Be: deadline DESCRIPTION /by YYYY-MM-DD [#TAG]...", exception.getMessage());
+        assertEquals("Bogus blank /by. :[", exception.getMessage());
     }
 
     /**
@@ -406,8 +406,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("event project meeting /from  /to 2026-09-16"));
 
-        assertEquals("Bwhere /from? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...",
-                exception.getMessage());
+        assertEquals("Bogus blank /from. :[", exception.getMessage());
     }
 
     /**
@@ -434,8 +433,7 @@ public class ParserTest {
         BogosException exception = assertThrows(BogosException.class,
                 () -> parser.parseTask("event project meeting /from 2026-09-15 /to "));
 
-        assertEquals("Bwhere /to? Be: event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD [#TAG]...",
-                exception.getMessage());
+        assertEquals("Bogus blank /to. :[", exception.getMessage());
     }
 
     /**

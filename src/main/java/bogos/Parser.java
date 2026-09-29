@@ -231,9 +231,9 @@ public class Parser {
      */
     private String getMissingDateParameterError(String parameter) {
         return switch (parameter) {
-        case "/by" -> DEADLINE_BY_ERROR;
-        case "/from" -> EVENT_FROM_ERROR;
-        case "/to" -> EVENT_TO_ERROR;
+        case "/by" -> "Bogus blank /by. :[";
+        case "/from" -> "Bogus blank /from. :[";
+        case "/to" -> "Bogus blank /to. :[";
         default -> throw new IllegalArgumentException("Unknown date parameter: " + parameter);
         };
     }
