@@ -256,36 +256,6 @@ public class Parser {
     }
 
     /**
-     * Returns a non-blank deadline description or its command-specific usage error.
-     *
-     * @param descriptionText Text to validate and trim.
-     * @return Trimmed non-blank deadline description.
-     * @throws BogosException If the description is blank.
-     */
-    private String getRequiredDeadlineDescription(String descriptionText) throws BogosException {
-        String trimmedDescription = descriptionText.trim();
-        if (trimmedDescription.isBlank()) {
-            throw new BogosException(DEADLINE_BODY_ERROR);
-        }
-        return trimmedDescription;
-    }
-
-    /**
-     * Returns a non-blank event description or its command-specific usage error.
-     *
-     * @param descriptionText Text to validate and trim.
-     * @return Trimmed non-blank event description.
-     * @throws BogosException If the description is blank.
-     */
-    private String getRequiredEventDescription(String descriptionText) throws BogosException {
-        String trimmedDescription = descriptionText.trim();
-        if (trimmedDescription.isBlank()) {
-            throw new BogosException(EVENT_BODY_ERROR);
-        }
-        return trimmedDescription;
-    }
-
-    /**
      * Parses an ISO-8601 date and converts failures to a user-facing error.
      *
      * @param dateText Date text to parse.
